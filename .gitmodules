@@ -1,0 +1,3 @@
+[submodule "sources_non_forked/copilot.vim"]
+	path = sources_non_forked/copilot.vim
+	url = git@github.com:github/copilot.vim.git
