@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 try:
     import concurrent.futures as futures
 except ImportError:
