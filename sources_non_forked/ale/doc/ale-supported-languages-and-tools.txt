@@ -168,6 +168,7 @@ Notes:
   * `dialyxir`
   * `dogma`!!
   * `elixir-ls`
+  * `lexical`
   * `mix`!!
 * Elm
   * `elm-format`
@@ -546,6 +547,7 @@ Notes:
   * `brakeman`!!
   * `cspell`
   * `debride`
+  * `packwerk`!!
   * `prettier`
   * `rails_best_practices`!!
   * `reek`
@@ -586,6 +588,7 @@ Notes:
 * SML
   * `smlnj`
 * Solidity
+  * `forge`
   * `solc`
   * `solhint`
   * `solium`
@@ -699,6 +702,7 @@ Notes:
   * `swaglint`
   * `yaml-language-server`
   * `yamlfix`
+  * `yamlfmt`
   * `yamllint`
 * YANG
   * `yang-lsp`
