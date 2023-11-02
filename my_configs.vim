@@ -1,8 +1,20 @@
-set go+=!,
+"vim
+
+"set go+=!,
+
+autocmd! bufwritepost  vimrc source %
+autocmd! bufwritepost .vimrc source %
+autocmd! bufwritepost my_configs.vim source %
 
 filetype plugin on
 
-autocmd! bufwritepost .vimrc source %
+if has("autocmd")
+    autocmd BufNewFile,BufRead * if match(getline(1),"python") >= 0 | set filetype=python     | endif
+    autocmd BufNewFile,BufRead * if match(getline(1),"node")   >= 0 | set filetype=javascript | endif
+    autocmd BufNewFile,BufRead * if match(getline(1),"bash")   >= 0 | set filetype=bash       | endif
+    autocmd BufNewFile,BufRead * if match(getline(1),"vim")    >= 0 | set filetype=vim        | endif
+    autocmd BufNewFile,BufRead * if match(getline(1),"sh")     >= 0 | set filetype=shell      | endif
+endif
 
 if has("autocmd")
     " configure expanding of tabs for various file types
@@ -77,7 +89,7 @@ let g:solarized_termcolors=256
     set termguicolors
     colorscheme solarized
 else
-set background=dark
+set background=light
 let g:solarized_termcolors=256
     set termguicolors
     colorscheme solarized
