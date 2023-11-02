@@ -1,5 +1,7 @@
 set go+=!,
 
+filetype plugin on
+
 autocmd! bufwritepost .vimrc source %
 
 if has("autocmd")
