@@ -1,3 +1,6 @@
 [submodule "sources_forked/vim-chatgpt"]
 	path = sources_forked/vim-chatgpt
 	url = https://github.com/CoderCookE/vim-chatgpt.git
+[submodule "sources_non_forked/copilot.vim"]
+	path = sources_non_forked/copilot.vim
+	url = https://github.com/github/copilot.vim.git
