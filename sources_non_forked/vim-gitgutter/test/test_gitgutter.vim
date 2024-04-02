@@ -52,6 +52,7 @@ endfunction
 "
 
 function SetUp()
+  let g:gitgutter_diff_base = ''
   call system("git init ".s:test_repo.
         \ " && cd ".s:test_repo.
         \ " && cp ../.gitconfig .".
@@ -195,6 +196,20 @@ function Test_filename_with_equals()
 endfunction
 
 
+function Test_filename_with_colon()
+  call system('touch fix:ture.txt && git add fix:ture.txt')
+  edit fix:ture.txt
+  normal ggo*
+  call s:trigger_gitgutter()
+
+  let expected = [
+        \ {'lnum': 1, 'name': 'GitGutterLineAdded'},
+        \ {'lnum': 2, 'name': 'GitGutterLineAdded'}
+        \ ]
+  call s:assert_signs(expected, 'fix:ture.txt')
+endfunction
+
+
 function Test_filename_with_square_brackets()
   call system('touch fix[tu]re.txt && git add fix[tu]re.txt')
   edit fix[tu]re.txt
@@ -277,6 +292,29 @@ function Test_saveas()
   call assert_equal(1, b:gitgutter.enabled)
   call assert_equal(-2, b:gitgutter.path)
   call s:assert_signs([], 'other.txt')
+endfunction
+
+
+function Test_file_mv()
+  call system('git mv fixture.txt fixture_moved.txt')
+  edit fixture_moved.txt
+  normal ggo*
+  call s:trigger_gitgutter()
+  let expected = [{'lnum': 2, 'name': 'GitGutterLineAdded'}]
+  call s:assert_signs(expected, 'fixture_moved.txt')
+
+  write
+  call system('git add fixture_moved.txt && git commit -m "moved and edited"')
+  GitGutterDisable
+  GitGutterEnable
+  let expected = []
+  call s:assert_signs(expected, 'fixture_moved.txt')
+
+  GitGutterDisable
+  let g:gitgutter_diff_base = 'HEAD^'
+  GitGutterEnable
+  let expected = [{'lnum': 2, 'name': 'GitGutterLineAdded'}]
+  call s:assert_signs(expected, 'fixture_moved.txt')
 endfunction
 
 

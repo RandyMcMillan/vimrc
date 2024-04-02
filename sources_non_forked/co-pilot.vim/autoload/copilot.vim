@@ -1,8 +1,3 @@
-if exists('g:autoloaded_copilot')
-  finish
-endif
-let g:autoloaded_copilot = 1
-
 scriptencoding utf-8
 
 let s:has_nvim_ghost_text = has('nvim-0.6') && exists('*nvim_buf_get_mark')
@@ -39,17 +34,8 @@ function! s:EditorConfiguration() abort
         \ }
 endfunction
 
-function! s:StatusNotification(params, ...) abort
-  let status = get(a:params, 'status', '')
-  if status ==? 'error'
-    let s:agent_error = a:params.message
-  else
-    unlet! s:agent_error
-  endif
-endfunction
-
 function! copilot#Init(...) abort
-  call timer_start(0, { _ -> s:Start() })
+  call copilot#util#Defer({ -> exists('s:agent') || s:Start() })
 endfunction
 
 function! s:Running() abort
@@ -60,8 +46,7 @@ function! s:Start() abort
   if s:Running()
     return
   endif
-  let s:agent = copilot#agent#New({'notifications': {
-        \ 'statusNotification': function('s:StatusNotification'),
+  let s:agent = copilot#agent#New({'methods': {
         \ 'PanelSolution': function('copilot#panel#Solution'),
         \ 'PanelSolutionsDone': function('copilot#panel#SolutionsDone'),
         \ },
@@ -89,14 +74,28 @@ function! copilot#RunningAgent() abort
 endfunction
 
 function! s:NodeVersionWarning() abort
-  if exists('s:agent.node_version') && s:agent.node_version =~# '^16\.'
+  if exists('s:agent.node_version') && s:agent.node_version =~# '^1[67]\.'
     echohl WarningMsg
-    echo "Warning: Node.js 16 is approaching end of life and support will be dropped in a future release of copilot.vim."
+    echo "Warning: Node.js" matchstr(s:agent.node_version, '^\d\+') "is end-of-life and support will be dropped in a future release of copilot.vim."
     echohl NONE
   elseif exists('s:agent.node_version_warning')
     echohl WarningMsg
     echo 'Warning:' s:agent.node_version_warning
     echohl NONE
+  endif
+endfunction
+
+if has('nvim-0.6') && !has(luaeval('vim.version().api_prerelease') ? 'nvim-0.7.1' : 'nvim-0.7.0')
+  let s:editor_warning = 'Neovim 0.6 support is deprecated and will be dropped in a future release of copilot.vim.'
+endif
+if has('vim_starting') && exists('s:editor_warning')
+  call copilot#logger#Warn(s:editor_warning)
+endif
+function! s:EditorVersionWarning() abort
+  if exists('s:editor_warning')
+    echohl WarningMsg
+    echo 'Warning: ' . s:editor_warning
+    echohl None
   endif
 endfunction
 
@@ -152,9 +151,6 @@ function! copilot#Dismiss() abort
 endfunction
 
 let s:filetype_defaults = {
-      \ 'yaml': 0,
-      \ 'markdown': 0,
-      \ 'help': 0,
       \ 'gitcommit': 0,
       \ 'gitrebase': 0,
       \ 'hgcommit': 0,
@@ -200,6 +196,12 @@ function! copilot#Complete(...) abort
   endif
   let params = copilot#doc#Params()
   if !exists('b:_copilot.params') || b:_copilot.params !=# params
+    if exists('b:_copilot.first')
+      call copilot#agent#Cancel(b:_copilot.first)
+    endif
+    if exists('b:_copilot.cycling')
+      call copilot#agent#Cancel(b:_copilot.cycling)
+    endif
     let b:_copilot = {'params': params, 'first':
           \ copilot#Request('getCompletions', params)}
     let g:_copilot_last = b:_copilot
@@ -230,7 +232,7 @@ function! s:SuggestionTextWithAdjustments() abort
     endif
     let line = getline('.')
     let offset = col('.') - 1
-    let choice_text = strpart(line, 0, copilot#doc#UTF16ToByteIdx(line, choice.range.start.character)) . choice.text
+    let choice_text = strpart(line, 0, copilot#doc#UTF16ToByteIdx(line, choice.range.start.character)) . substitute(choice.text, "\n*$", '', '')
     let typed = strpart(line, 0, offset)
     let end_offset = copilot#doc#UTF16ToByteIdx(line, choice.range.end.character)
     if end_offset < 0
@@ -347,7 +349,7 @@ function! s:UpdatePreview() abort
     call s:ClearPreview()
     if s:has_nvim_ghost_text
       let data = {'id': 1}
-      let data.virt_text_win_col = virtcol('.') - 1
+      let data.virt_text_pos = 'overlay'
       let append = strpart(getline('.'), col('.') - 1 + delete)
       let data.virt_text = [[text[0] . append . repeat(' ', delete - len(text[0])), s:hlgroup]]
       if len(text) > 1
@@ -389,6 +391,9 @@ function! s:HandleTriggerResult(result) abort
 endfunction
 
 function! copilot#Suggest() abort
+  if !s:Running()
+    return ''
+  endif
   try
     call copilot#Complete(function('s:HandleTriggerResult'), function('s:HandleTriggerResult'))
   catch
@@ -399,25 +404,47 @@ endfunction
 
 function! s:Trigger(bufnr, timer) abort
   let timer = get(g:, '_copilot_timer', -1)
-  unlet! g:_copilot_timer
   if a:bufnr !=# bufnr('') || a:timer isnot# timer || mode() !=# 'i'
     return
   endif
+  unlet! g:_copilot_timer
   return copilot#Suggest()
 endfunction
 
-function! copilot#IsMapped() abort
-  return get(g:, 'copilot_assume_mapped') ||
-        \ hasmapto('copilot#Accept(', 'i')
-endfunction
-
 function! copilot#Schedule(...) abort
-  call copilot#Clear()
-  if !s:has_ghost_text || !copilot#Enabled() || !copilot#IsMapped()
+  if !s:has_ghost_text || !copilot#Enabled()
+    call copilot#Clear()
     return
   endif
+  call s:UpdatePreview()
   let delay = a:0 ? a:1 : get(g:, 'copilot_idle_delay', 15)
+  call timer_stop(get(g:, '_copilot_timer', -1))
   let g:_copilot_timer = timer_start(delay, function('s:Trigger', [bufnr('')]))
+endfunction
+
+function! s:Attach(bufnr, ...) abort
+  try
+    return copilot#Agent().Attach(a:bufnr)
+  catch
+    call copilot#logger#Exception()
+  endtry
+endfunction
+
+function! copilot#OnFileType() abort
+  if empty(s:BufferDisabled()) && &l:modifiable && &l:buflisted
+    call copilot#util#Defer(function('s:Attach'), bufnr(''))
+  endif
+endfunction
+
+function! s:Focus(bufnr, ...) abort
+  if s:Running() && copilot#Agent().IsAttached(a:bufnr)
+    call copilot#Agent().Notify('textDocument/didFocus', {'textDocument': {'uri': copilot#Agent().Attach(a:bufnr).uri}})
+  endif
+endfunction
+
+function! copilot#OnBufEnter() abort
+  let bufnr = bufnr('')
+  call copilot#util#Defer(function('s:Focus'), bufnr)
 endfunction
 
 function! copilot#OnInsertLeave() abort
@@ -459,11 +486,22 @@ function! copilot#Accept(...) abort
   let s = copilot#GetDisplayedSuggestion()
   if !empty(s.text)
     unlet! b:_copilot
-    call copilot#Request('notifyAccepted', {'uuid': s.uuid})
+    let text = ''
+    if a:0 > 1
+      let text = substitute(matchstr(s.text, "\n*" . '\%(' . a:2 .'\)'), "\n*$", '', '')
+    endif
+    if empty(text)
+      let text = s.text
+    endif
+    let acceptance = {'uuid': s.uuid}
+    if text !=# s.text
+      let acceptance.acceptedLength = copilot#doc#UTF16Width(text)
+    endif
+    call copilot#Request('notifyAccepted', acceptance)
     call s:ClearPreview()
-    let s:suggestion_text = s.text
+    let s:suggestion_text = text
     return repeat("\<Left>\<Del>", s.outdentSize) . repeat("\<Del>", s.deleteSize) .
-            \ "\<C-R>\<C-O>=copilot#TextQueuedForInsertion()\<CR>\<End>"
+            \ "\<C-R>\<C-O>=copilot#TextQueuedForInsertion()\<CR>" . (a:0 > 1 ? '' : "\<End>")
   endif
   let default = get(g:, 'copilot_tab_fallback', pumvisible() ? "\<C-N>" : "\t")
   if !a:0
@@ -481,21 +519,36 @@ function! copilot#Accept(...) abort
   endif
 endfunction
 
+function! copilot#AcceptWord(...) abort
+  return copilot#Accept(a:0 ? a:1 : '', '\%(\k\@!.\)*\k*')
+endfunction
+
+function! copilot#AcceptLine(...) abort
+  return copilot#Accept(a:0 ? a:1 : "\r", "[^\n]\\+")
+endfunction
+
 function! s:BrowserCallback(into, code) abort
   let a:into.code = a:code
 endfunction
 
 function! copilot#Browser() abort
   if type(get(g:, 'copilot_browser')) == v:t_list
-    return copy(g:copilot_browser)
-  elseif has('win32') && executable('rundll32')
-    return ['rundll32', 'url.dll,FileProtocolHandler']
-  elseif isdirectory('/private') && executable('/usr/bin/open')
-    return ['/usr/bin/open']
-  elseif executable('gio')
-    return ['gio', 'open']
+    let cmd = copy(g:copilot_browser)
+  elseif type(get(g:, 'open_command')) == v:t_list
+    let cmd = copy(g:open_command)
+  elseif has('win32')
+    let cmd = ['rundll32', 'url.dll,FileProtocolHandler']
+  elseif has('mac')
+    let cmd = ['open']
+  elseif executable('wslview')
+    return ['wslview']
   elseif executable('xdg-open')
     return ['xdg-open']
+  else
+    return []
+  endif
+  if executable(get(cmd, 0, ''))
+    return cmd
   else
     return []
   endif
@@ -511,8 +564,6 @@ function! s:EnabledStatusMessage() abort
     else
       return "Vim " . s:vim_minimum_version . " required to support ghost text"
     endif
-  elseif !copilot#IsMapped()
-    return '<Tab> map has been disabled or is claimed by another plugin'
   elseif !get(g:, 'copilot_enabled', 1)
     return 'Disabled globally by :Copilot disable'
   elseif buf_disabled is# 5
@@ -550,11 +601,25 @@ function! s:VerifySetup() abort
     echo 'Copilot: Telemetry terms not accepted. Invoke :Copilot setup'
     return
   endif
+
+  if status.status ==# 'NotAuthorized'
+    echo "Copilot: You don't have access to GitHub Copilot. Sign up by visiting https://github.com/settings/copilot"
+    return
+  endif
+
   return 1
 endfunction
 
 function! s:commands.status(opts) abort
   if !s:VerifySetup()
+    return
+  endif
+
+  if exists('s:agent.status.status') && s:agent.status.status =~# 'Warning\|Error'
+    echo 'Copilot: ' . s:agent.status.status
+    if !empty(get(s:agent.status, 'message', ''))
+      echon ': ' . s:agent.status.message
+    endif
     return
   endif
 
@@ -564,24 +629,8 @@ function! s:commands.status(opts) abort
     return
   endif
 
-  let startup_error = copilot#Agent().StartupError()
-  if !empty(startup_error)
-      echo 'Copilot: ' . startup_error
-      return
-  endif
-
-  if exists('s:agent_error')
-    echo 'Copilot: ' . s:agent_error
-    return
-  endif
-
-  let status = copilot#Call('checkStatus', {})
-  if status.status ==# 'NotAuthorized'
-    echo 'Copilot: Not authorized'
-    return
-  endif
-
-  echo 'Copilot: Enabled and online'
+  echo 'Copilot: Ready'
+  call s:EditorVersionWarning()
   call s:NodeVersionWarning()
 endfunction
 
@@ -606,7 +655,7 @@ function! s:commands.setup(opts) abort
 
   let status = copilot#Call('checkStatus', {})
   if has_key(status, 'user')
-    let data = {}
+    let data = {'status': 'AlreadySignedIn', 'user': status.user}
   else
     let data = copilot#Call('signInInitiate', {})
   endif
@@ -614,23 +663,25 @@ function! s:commands.setup(opts) abort
   if has_key(data, 'verificationUri')
     let uri = data.verificationUri
     if has('clipboard')
-      let @+ = data.userCode
-      let @* = data.userCode
+      try
+        let @+ = data.userCode
+      catch
+      endtry
+      try
+        let @* = data.userCode
+      catch
+      endtry
     endif
-    call s:Echo("First copy your one-time code: " . data.userCode)
+    let codemsg = "First copy your one-time code: " . data.userCode . "\n"
     try
       if len(&mouse)
         let mouse = &mouse
         set mouse=
       endif
       if get(a:opts, 'bang')
-        call s:Echo("In your browser, visit " . uri)
+        call s:Echo(codemsg . "In your browser, visit " . uri)
       elseif len(browser)
-        call s:Echo("Press ENTER to open GitHub in your browser")
-        let c = getchar()
-        while c isnot# 13 && c isnot# 10 && c isnot# 0
-          let c = getchar()
-        endwhile
+        call input(codemsg . "Press ENTER to open GitHub in your browser\n")
         let status = {}
         call copilot#job#Stream(browser + [uri], v:null, v:null, function('s:BrowserCallback', [status]))
         let time = reltime()
@@ -643,9 +694,9 @@ function! s:commands.setup(opts) abort
           call s:Echo("Opened " . uri)
         endif
       else
-        call s:Echo("Could not find browser.  Visit " . uri)
+        call s:Echo(codemsg . "Could not find browser.  Visit " . uri)
       endif
-      call s:Echo("Waiting (could take up to 5 seconds)")
+      call s:Echo("Waiting (could take up to 10 seconds)")
       let request = copilot#Request('signInConfirm', {'userCode': data.userCode}).Wait()
     finally
       if exists('mouse')
@@ -657,6 +708,8 @@ function! s:commands.setup(opts) abort
     else
       let status = request.result
     endif
+  elseif get(data, 'status', '') isnot# 'AlreadySignedIn'
+    return 'echoerr ' . string('Copilot: Something went wrong')
   endif
 
   let user = get(status, 'user', '<unknown>')
@@ -665,22 +718,47 @@ function! s:commands.setup(opts) abort
 endfunction
 
 let s:commands.auth = s:commands.setup
+let s:commands.signin = s:commands.setup
 
 function! s:commands.help(opts) abort
   return a:opts.mods . ' help ' . (len(a:opts.arg) ? ':Copilot_' . a:opts.arg : 'copilot')
 endfunction
 
 function! s:commands.version(opts) abort
-  let info = copilot#agent#EditorInfo()
-  echo 'copilot.vim ' .info.editorPluginInfo.version
-  echo info.editorInfo.name . ' ' . info.editorInfo.version
-  if exists('s:agent.node_version')
-    echo 'dist/agent.js ' . s:agent.Call('getVersion', {}).version
-    echo 'Node.js ' . s:agent.node_version
-    call s:NodeVersionWarning()
+  echo 'copilot.vim ' .copilot#agent#EditorPluginInfo().version
+  let editorInfo = copilot#agent#EditorInfo()
+  echo editorInfo.name . ' ' . editorInfo.version
+  if s:Running()
+    let versions = s:agent.Request('getVersion', {})
+    if exists('s:agent.serverInfo.version')
+      echo s:agent.serverInfo.name . ' ' . s:agent.serverInfo.version
+    else
+      echo 'dist/agent.js ' . versions.Await().version
+    endif
+    if exists('s:agent.node_version')
+      echo 'Node.js ' . s:agent.node_version
+    else
+      echo 'Node.js ' . substitute(get(versions.Await(), 'runtimeVersion', '?'), '^node/', '', 'g')
+    endif
   else
-    echo 'dist/agent.js not running'
+    echo 'Not running'
+    if exists('s:agent.node_version')
+      echo 'Node.js ' . s:agent.node_version
+    endif
   endif
+  if has('win32')
+    echo 'Windows'
+  elseif has('macunix')
+    echo 'macOS'
+  elseif !has('unix')
+    echo 'Unknown OS'
+  elseif isdirectory('/sys/kernel')
+    echo 'Linux'
+  else
+    echo 'UNIX'
+  endif
+  call s:EditorVersionWarning()
+  call s:NodeVersionWarning()
 endfunction
 
 function! s:UpdateEditorConfiguration() abort
@@ -741,7 +819,7 @@ function! copilot#Command(line1, line2, range, bang, mods, arg) abort
   let cmd = matchstr(a:arg, '^\%(\\.\|\S\)\+')
   let arg = matchstr(a:arg, '\s\zs\S.*')
   if cmd ==# 'log'
-    return a:mods . ' split +$ ' . fnameescape(copilot#logger#File())
+    return a:mods . ' split +$ copilot:///log'
   endif
   if !empty(cmd) && !has_key(s:commands, tr(cmd, '-', '_'))
     return 'echoerr ' . string('Copilot: unknown command ' . string(cmd))
@@ -759,7 +837,7 @@ function! copilot#Command(line1, line2, range, bang, mods, arg) abort
     endtry
     if empty(cmd)
       if opts.status ==# 'VimException'
-        return a:mods . ' split +$ ' . fnameescape(copilot#logger#File())
+        return a:mods . ' split +$ copilot:///log'
       elseif opts.status !=# 'OK' && opts.status !=# 'MaybeOK'
         let cmd = 'setup'
       else
