@@ -77,6 +77,10 @@ if !exists('g:dracula_italic')
   let g:dracula_italic = 1
 endif
 
+if !exists('g:dracula_strikethrough')
+  let g:dracula_strikethrough = 1
+endif
+
 if !exists('g:dracula_underline')
   let g:dracula_underline = 1
 endif
@@ -107,6 +111,7 @@ endif
 let s:attrs = {
       \ 'bold': g:dracula_bold == 1 ? 'bold' : 0,
       \ 'italic': g:dracula_italic == 1 ? 'italic' : 0,
+      \ 'strikethrough': g:dracula_strikethrough == 1 ? 'strikethrough' : 0,
       \ 'underline': g:dracula_underline == 1 ? 'underline' : 0,
       \ 'undercurl': g:dracula_undercurl == 1 ? 'undercurl' : 0,
       \ 'inverse': g:dracula_inverse == 1 ? 'inverse' : 0,
@@ -154,6 +159,7 @@ call s:h('DraculaBgDarker', s:none, s:bgdarker)
 call s:h('DraculaFg', s:fg)
 call s:h('DraculaFgUnderline', s:fg, s:none, [s:attrs.underline])
 call s:h('DraculaFgBold', s:fg, s:none, [s:attrs.bold])
+call s:h('DraculaFgStrikethrough', s:fg, s:none, [s:attrs.strikethrough])
 
 call s:h('DraculaComment', s:comment)
 call s:h('DraculaCommentBold', s:comment, s:none, [s:attrs.bold])
@@ -210,6 +216,7 @@ else
 endif
 
 call s:h('DraculaDiffText', s:bg, s:orange)
+call s:h('DraculaInlayHint', s:comment, s:bgdark)
 
 " }}}2
 
@@ -283,6 +290,7 @@ if has('nvim')
   hi! link LspDiagnosticsUnderlineHint DiagnosticUnderlineHint
   hi! link LspDiagnosticsUnderlineInformation DiagnosticUnderlineInfo
   hi! link LspDiagnosticsUnderlineWarning DiagnosticUnderlineWarn
+  hi! link LspInlayHint DraculaInlayHint
 
   hi! link DiagnosticInfo DraculaCyan
   hi! link DiagnosticHint DraculaCyan
@@ -294,6 +302,24 @@ if has('nvim')
   hi! link DiagnosticUnderlineWarn DraculaWarnLine
 
   hi! link WinSeparator DraculaWinSeparator
+
+  if has('nvim-0.9')
+    hi! link  @lsp.type.class DraculaCyan
+    hi! link  @lsp.type.decorator DraculaGreen
+    hi! link  @lsp.type.enum DraculaCyan
+    hi! link  @lsp.type.enumMember DraculaPurple
+    hi! link  @lsp.type.function DraculaGreen
+    hi! link  @lsp.type.interface DraculaCyan
+    hi! link  @lsp.type.macro DraculaCyan
+    hi! link  @lsp.type.method DraculaGreen
+    hi! link  @lsp.type.namespace DraculaCyan
+    hi! link  @lsp.type.parameter DraculaOrangeItalic
+    hi! link  @lsp.type.property DraculaOrange
+    hi! link  @lsp.type.struct DraculaCyan
+    hi! link  @lsp.type.type DraculaCyanItalic
+    hi! link  @lsp.type.typeParameter DraculaPink
+    hi! link  @lsp.type.variable DraculaFg
+  endif
 else
   hi! link SpecialKey DraculaPink
 endif
