@@ -186,11 +186,11 @@ script like so. >
   exec docker run -i --rm -v "$(pwd):/data" cytopia/pylint "$@"
 <
 
-You will run to run Docker commands with `-i` in order to read from stdin.
+You will want to run Docker commands with `-i` in order to read from stdin.
 
 With the above script in mind, you might configure ALE to lint your Python
 project with `pylint` by providing the path to the script to execute, and
-mappings which describe how to between the two file systems in your
+mappings which describe how to change between the two file systems in your
 `python.vim` |ftplugin| file, like so: >
 
   if expand('%:p') =~# '^/home/w0rp/git/test-pylint/'
@@ -2918,6 +2918,7 @@ documented in additional help files.
     astyle................................|ale-c-astyle|
     cc....................................|ale-c-cc|
     ccls..................................|ale-c-ccls|
+    clangcheck............................|ale-c-clangcheck|
     clangd................................|ale-c-clangd|
     clang-format..........................|ale-c-clangformat|
     clangtidy.............................|ale-c-clangtidy|
@@ -2927,6 +2928,7 @@ documented in additional help files.
     flawfinder............................|ale-c-flawfinder|
     uncrustify............................|ale-c-uncrustify|
   cairo...................................|ale-cairo-options|
+    scarb.................................|ale-cairo-scarb|
     starknet..............................|ale-cairo-starknet|
   chef....................................|ale-chef-options|
     cookstyle.............................|ale-chef-cookstyle|
@@ -3029,6 +3031,9 @@ documented in additional help files.
     fusion-lint...........................|ale-fuse-fusionlint|
   git commit..............................|ale-gitcommit-options|
     gitlint...............................|ale-gitcommit-gitlint|
+  gleam...................................|ale-gleam-options|
+    gleam_format..........................|ale-gleam-gleam_format|
+    gleamlsp..............................|ale-gleam-gleamlsp|
   glsl....................................|ale-glsl-options|
     glslang...............................|ale-glsl-glslang|
     glslls................................|ale-glsl-glslls|
@@ -3093,6 +3098,8 @@ documented in additional help files.
     tidy..................................|ale-html-tidy|
     vscodehtml............................|ale-html-vscode|
     write-good............................|ale-html-write-good|
+  hurl....................................|ale-hurl-options|
+    hurlfmt...............................|ale-hurl-hurlfmt|
   idris...................................|ale-idris-options|
     idris.................................|ale-idris-idris|
   ink.....................................|ale-ink-options|
@@ -3112,6 +3119,7 @@ documented in additional help files.
     eclipselsp............................|ale-java-eclipselsp|
     uncrustify............................|ale-java-uncrustify|
   javascript..............................|ale-javascript-options|
+    biome.................................|ale-javascript-biome|
     clang-format..........................|ale-javascript-clangformat|
     cspell................................|ale-javascript-cspell|
     deno..................................|ale-javascript-deno|
@@ -3187,6 +3195,8 @@ documented in additional help files.
     mmc...................................|ale-mercury-mmc|
   nasm....................................|ale-nasm-options|
     nasm..................................|ale-nasm-nasm|
+  nickel..................................|ale-nickel-options|
+    nickel_format.........................|ale-nickel-nickel-format|
   nim.....................................|ale-nim-options|
     nimcheck..............................|ale-nim-nimcheck|
     nimlsp................................|ale-nim-nimlsp|
@@ -3216,6 +3226,8 @@ documented in additional help files.
     ols...................................|ale-ocaml-ols|
     ocamlformat...........................|ale-ocaml-ocamlformat|
     ocp-indent............................|ale-ocaml-ocp-indent|
+  odin....................................|ale-odin-options|
+    ols...................................|ale-odin-ols|
   openapi.................................|ale-openapi-options|
     ibm_validator.........................|ale-openapi-ibm-validator|
     prettier..............................|ale-openapi-prettier|
@@ -3303,6 +3315,7 @@ documented in additional help files.
     refurb................................|ale-python-refurb|
     reorder-python-imports................|ale-python-reorder_python_imports|
     ruff..................................|ale-python-ruff|
+    ruff-format...........................|ale-python-ruff-format|
     unimport..............................|ale-python-unimport|
     vulture...............................|ale-python-vulture|
     yapf..................................|ale-python-yapf|
@@ -3345,6 +3358,7 @@ documented in additional help files.
     sorbet................................|ale-ruby-sorbet|
     standardrb............................|ale-ruby-standardrb|
     syntax_tree...........................|ale-ruby-syntax_tree|
+    rubyfmt...............................|ale-ruby-rubyfmt|
   rust....................................|ale-rust-options|
     analyzer..............................|ale-rust-analyzer|
     cargo.................................|ale-rust-cargo|
@@ -3431,6 +3445,7 @@ documented in additional help files.
   toml....................................|ale-toml-options|
     dprint................................|ale-toml-dprint|
   typescript..............................|ale-typescript-options|
+    biome.................................|ale-typescript-biome|
     cspell................................|ale-typescript-cspell|
     deno..................................|ale-typescript-deno|
     dprint................................|ale-typescript-dprint|
@@ -3448,6 +3463,7 @@ documented in additional help files.
   verilog/systemverilog...................|ale-verilog-options|
     hdl-checker...........................|ale-verilog-hdl-checker|
     iverilog..............................|ale-verilog-iverilog|
+    slang.................................|ale-verilog-slang|
     verilator.............................|ale-verilog-verilator|
     vlog..................................|ale-verilog-vlog|
     xvlog.................................|ale-verilog-xvlog|

@@ -76,6 +76,7 @@ formatting.
   * [ccls](https://github.com/MaskRay/ccls)
   * [clang](http://clang.llvm.org/)
   * [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
+  * [clangcheck](http://clang.llvm.org/docs/ClangCheck.html) :floppy_disk:
   * [clangd](https://clang.llvm.org/extra/clangd.html)
   * [clangtidy](http://clang.llvm.org/extra/clang-tidy/) :floppy_disk:
   * [cppcheck](http://cppcheck.sourceforge.net)
@@ -110,6 +111,7 @@ formatting.
   * [gcc](https://gcc.gnu.org/)
   * [uncrustify](https://github.com/uncrustify/uncrustify)
 * Cairo
+  * [scarb](https://docs.swmansion.com/scarb/) :floppy_disk:
   * [starknet](https://starknet.io/docs)
 * Chef
   * [cookstyle](https://docs.chef.io/cookstyle.html)
@@ -209,6 +211,9 @@ formatting.
   * [fusion-lint](https://github.com/RyanSquared/fusionscript)
 * Git Commit Messages
   * [gitlint](https://github.com/jorisroovers/gitlint)
+* Gleam
+  * [gleam_format](https://github.com/gleam-lang/gleam)
+  * [gleamlsp](https://github.com/gleam-lang/gleam)
 * GLSL
   * [glslang](https://github.com/KhronosGroup/glslang)
   * [glslls](https://github.com/svenstaro/glsl-language-server)
@@ -278,6 +283,8 @@ formatting.
   * [rustywind](https://github.com/avencera/rustywind)
   * [tidy](http://www.html-tidy.org/)
   * [write-good](https://github.com/btford/write-good)
+* Hurl
+  * [hurlfmt](https://hurl.dev)
 * Idris
   * [idris](http://www.idris-lang.org/)
 * Ink
@@ -297,6 +304,7 @@ formatting.
   * [javalsp](https://github.com/georgewfraser/vscode-javac)
   * [uncrustify](https://github.com/uncrustify/uncrustify)
 * JavaScript
+  * [biome](https://biomejs.dev/)
   * [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
   * [cspell](https://github.com/streetsidesoftware/cspell/tree/main/packages/cspell)
   * [deno](https://deno.land/)
@@ -390,6 +398,8 @@ formatting.
   * [mmc](http://mercurylang.org) :floppy_disk:
 * NASM
   * [nasm](https://www.nasm.us/) :floppy_disk:
+* Nickel
+  * [nickel_format](https://github.com/tweag/nickel#formatting)
 * Nim
   * [nim check](https://nim-lang.org/docs/nimc.html) :floppy_disk:
   * [nimlsp](https://github.com/PMunch/nimlsp)
@@ -423,6 +433,8 @@ formatting.
   * [ocamllsp](https://github.com/ocaml/ocaml-lsp)
   * [ocp-indent](https://github.com/OCamlPro/ocp-indent)
   * [ols](https://github.com/freebroccolo/ocaml-language-server)
+* Odin
+  * [ols](https://github.com/DanielGavin/ols)
 * OpenApi
   * [ibm_validator](https://github.com/IBM/openapi-validator)
   * [prettier](https://github.com/prettier/prettier)
@@ -514,6 +526,7 @@ formatting.
   * [refurb](https://github.com/dosisod/refurb) :floppy_disk:
   * [reorder-python-imports](https://github.com/asottile/reorder_python_imports)
   * [ruff](https://github.com/charliermarsh/ruff)
+  * [ruff-format](https://docs.astral.sh/ruff/formatter/)
   * [unimport](https://github.com/hakancelik96/unimport)
   * [vulture](https://github.com/jendrikseipp/vulture) :warning: :floppy_disk:
   * [yapf](https://github.com/google/yapf)
@@ -562,6 +575,7 @@ formatting.
   * [reek](https://github.com/troessner/reek)
   * [rubocop](https://github.com/bbatsov/rubocop)
   * [ruby](https://www.ruby-lang.org)
+  * [rubyfmt](https://github.com/fables-tales/rubyfmt)
   * [rufo](https://github.com/ruby-formatter/rufo)
   * [solargraph](https://solargraph.org)
   * [sorbet](https://github.com/sorbet/sorbet)
@@ -654,6 +668,7 @@ formatting.
 * TOML
   * [dprint](https://dprint.dev)
 * TypeScript
+  * [biome](https://biomejs.dev/)
   * [cspell](https://github.com/streetsidesoftware/cspell/tree/main/packages/cspell)
   * [deno](https://deno.land/)
   * [dprint](https://dprint.dev/)
@@ -673,6 +688,7 @@ formatting.
 * Verilog
   * [hdl-checker](https://pypi.org/project/hdl-checker)
   * [iverilog](https://github.com/steveicarus/iverilog)
+  * [slang](https://github.com/MikePopoloski/slang)
   * [verilator](http://www.veripool.org/projects/verilator/wiki/Intro)
   * [vlog](https://www.mentor.com/products/fv/questa/)
   * [xvlog](https://www.xilinx.com/products/design-tools/vivado.html)
