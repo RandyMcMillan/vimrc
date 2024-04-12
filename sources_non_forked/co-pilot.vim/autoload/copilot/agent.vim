@@ -105,8 +105,11 @@ endfunction
 if !exists('s:id')
   let s:id = 0
 endif
+if !exists('s:progress_token_id')
+  let s:progress_token_id = 0
+endif
 
-function! s:SetUpRequest(agent, id, method, params, ...) abort
+function! s:SetUpRequest(agent, id, method, params, progress, ...) abort
   let request = {
         \ 'agent_id': a:agent.id,
         \ 'id': a:id,
@@ -118,6 +121,7 @@ function! s:SetUpRequest(agent, id, method, params, ...) abort
         \ 'Cancel': function('s:RequestCancel'),
         \ 'resolve': [],
         \ 'reject': [],
+        \ 'progress': a:progress,
         \ 'status': 'running'}
   let a:agent.requests[a:id] = request
   let args = a:000[2:-1]
@@ -190,14 +194,21 @@ endfunction
 
 function! s:PreprocessParams(agent, params) abort
   let bufnr = v:null
-  for doc in filter([get(a:params, 'doc', {}), get(a:params, 'textDocument', {})], 'type(get(v:val, "uri", "")) == v:t_number')
+  for doc in filter([get(a:params, 'textDocument', {})], 'type(get(v:val, "uri", "")) == v:t_number')
     let bufnr = doc.uri
     call s:RegisterWorkspaceFolderForBuffer(a:agent, bufnr)
-    let synced = a:agent.Attach(bufnr)
-    let doc.uri = synced.uri
-    let doc.version = get(synced, 'version', 0)
+    call extend(doc, a:agent.Attach(bufnr))
   endfor
-  return bufnr
+  let progress_tokens = []
+  for key in keys(a:params)
+    if key =~# 'Token$' && type(a:params[key]) == v:t_func
+      let s:progress_token_id += 1
+      let a:agent.progress[s:progress_token_id] = a:params[key]
+      call add(progress_tokens, s:progress_token_id)
+      let a:params[key] = s:progress_token_id
+    endif
+  endfor
+  return [bufnr, progress_tokens]
 endfunction
 
 function! s:VimAttach(bufnr) dict abort
@@ -208,7 +219,7 @@ function! s:VimAttach(bufnr) dict abort
   let doc = {
         \ 'uri': s:UriFromBufnr(bufnr),
         \ 'version': getbufvar(bufnr, 'changedtick', 0),
-        \ 'languageId': copilot#doc#LanguageForFileType(getbufvar(bufnr, '&filetype')),
+        \ 'languageId': getbufvar(bufnr, '&filetype'),
         \ }
   if has_key(self.open_buffers, bufnr) && (
         \ self.open_buffers[bufnr].uri !=# doc.uri ||
@@ -235,14 +246,14 @@ endfunction
 function! s:AgentRequest(method, params, ...) dict abort
   let s:id += 1
   let params = deepcopy(a:params)
-  call s:PreprocessParams(self, params)
+  let [_, progress] = s:PreprocessParams(self, params)
   let request = {'method': a:method, 'params': params, 'id': s:id}
   if has_key(self, 'initialization_pending')
     call add(self.initialization_pending, request)
   else
     call copilot#util#Defer(function('s:SendRequest'), self, request)
   endif
-  return call('s:SetUpRequest', [self, s:id, a:method, params] + a:000)
+  return call('s:SetUpRequest', [self, s:id, a:method, params, progress] + a:000)
 endfunction
 
 function! s:AgentCall(method, params, ...) dict abort
@@ -313,6 +324,11 @@ function! s:OnResponse(agent, response, ...) abort
     return
   endif
   let request = remove(a:agent.requests, id)
+  for progress_token in request.progress
+    if has_key(a:agent.progress, progress_token)
+      call remove(a:agent.progress, progress_token)
+    endif
+  endfor
   if request.status ==# 'canceled'
     return
   endif
@@ -388,10 +404,10 @@ endfunction
 
 function! s:LspRequest(method, params, ...) dict abort
   let params = deepcopy(a:params)
-  let bufnr = s:PreprocessParams(self, params)
+  let [bufnr, progress] = s:PreprocessParams(self, params)
   let id = eval("v:lua.require'_copilot'.lsp_request(self.id, a:method, params, bufnr)")
   if id isnot# v:null
-    return call('s:SetUpRequest', [self, id, a:method, params] + a:000)
+    return call('s:SetUpRequest', [self, id, a:method, params, progress] + a:000)
   endif
   if has_key(self, 'client_id')
     call copilot#agent#LspExit(self.client_id, -1, -1)
@@ -495,7 +511,7 @@ function! copilot#agent#EditorInfo() abort
     if has('nvim')
       let s:editor_version = matchstr(execute('version'), 'NVIM v\zs[^[:space:]]\+')
     else
-      let s:editor_version = (v:version / 100) . '.' . (v:version % 100) . (exists('v:versionlong') ? printf('.%04d', v:versionlong % 1000) : '')
+      let s:editor_version = (v:version / 100) . '.' . (v:version % 100) . (exists('v:versionlong') ? printf('.%04d', v:versionlong % 10000) : '')
     endif
   endif
   return {'name': has('nvim') ? 'Neovim': 'Vim', 'version': s:editor_version}
@@ -557,7 +573,6 @@ function! s:AgentStartupError() dict abort
 endfunction
 
 function! s:StatusNotification(params, agent) abort
-  call copilot#logger#Info('StatusNotification ' . string(a:params))
   let a:agent.status = a:params
 endfunction
 
@@ -565,7 +580,14 @@ function! s:Nop(...) abort
   return v:null
 endfunction
 
+function! s:Progress(params, agent) abort
+  if has_key(a:agent.progress, a:params.token)
+    call a:agent.progress[a:params.token](a:params.value)
+  endif
+endfunction
+
 let s:common_handlers = {
+      \ '$/progress': function('s:Progress'),
       \ 'featureFlagsNotification': function('s:Nop'),
       \ 'statusNotification': function('s:StatusNotification'),
       \ 'window/logMessage': function('copilot#handlers#window_logMessage'),
@@ -584,6 +606,7 @@ let s:vim_capabilities = {
 function! copilot#agent#New(...) abort
   let opts = a:0 ? a:1 : {}
   let instance = {'requests': {},
+        \ 'progress': {},
         \ 'workspaceFolders': {},
         \ 'status': {'status': 'Starting', 'message': ''},
         \ 'Close': function('s:AgentClose'),

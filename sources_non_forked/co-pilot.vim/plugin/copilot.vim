@@ -53,8 +53,8 @@ endfunction
 augroup github_copilot
   autocmd!
   autocmd FileType             * call s:Event('FileType')
-  autocmd InsertLeave          * call s:Event('InsertLeave')
-  autocmd BufLeave             * if mode() =~# '^[iR]'|call s:Event('InsertLeave')|endif
+  autocmd InsertLeavePre       * call s:Event('InsertLeavePre')
+  autocmd BufLeave             * if mode() =~# '^[iR]'|call s:Event('InsertLeavePre')|endif
   autocmd InsertEnter          * call s:Event('InsertEnter')
   autocmd BufEnter             * if mode() =~# '^[iR]'|call s:Event('InsertEnter')|endif
   autocmd BufEnter             * call s:Event('BufEnter')
