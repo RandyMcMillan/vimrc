@@ -1,6 +1,6 @@
 "vim
 
-"set go+=!,
+set go+=!
 
 autocmd! bufwritepost  vimrc source %
 autocmd! bufwritepost .vimrc source %
