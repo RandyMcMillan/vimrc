@@ -66,6 +66,7 @@ mru.vim https://github.com/vim-scripts/mru.vim
 editorconfig-vim https://github.com/editorconfig/editorconfig-vim
 dracula https://github.com/dracula/vim
 co-pilot.vim https://github.com/github/copilot.vim
+https://github.com/rhysd/vim-clang-format
 """.strip()
 
 GITHUB_ZIP = "%s/archive/master.zip"
