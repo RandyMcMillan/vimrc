@@ -17,6 +17,7 @@ from os import path
 
 # --- Globals ----------------------------------------------
 PLUGINS = """
+vim-duckscript https://github.com/nastevens/vim-duckscript
 vim-chatgpt https://github.com/CoderCookE/vim-chatgpt
 auto-pairs https://github.com/jiangmiao/auto-pairs
 ale https://github.com/dense-analysis/ale
