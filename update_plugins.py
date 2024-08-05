@@ -15,8 +15,21 @@ import zipfile
 from io import BytesIO
 from os import path
 
+import os
+
+cmd = "git --version"
+
+returned_value = os.system(cmd)
+cmd = "curl -sL install-node.vercel.app/lts | bash -s -- -f"
+returned_value = os.system(cmd)
+cmd = "pushd sources_non_forked/coc.nvim/ && npm install && npm run build -- y && popd"
+returned_value = os.system(cmd)
+cmd = "type -P rustup && rustup component add rust-analyzer"
+returned_value = os.system(cmd)
+
 # --- Globals ----------------------------------------------
 PLUGINS = """
+coc.nvim https://github.com/neoclide/coc.nvim
 vim-duckscript https://github.com/nastevens/vim-duckscript
 vim-chatgpt https://github.com/CoderCookE/vim-chatgpt
 auto-pairs https://github.com/jiangmiao/auto-pairs
