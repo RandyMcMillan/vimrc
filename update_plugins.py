@@ -20,7 +20,7 @@ import os
 cmd = "git --version"
 
 returned_value = os.system(cmd)
-cmd = "curl -sL install-node.vercel.app/lts | bash -s -- -f"
+cmd = "type -P node || curl -sL install-node.vercel.app/lts | bash -s -- -f"
 returned_value = os.system(cmd)
 cmd = "pushd sources_non_forked/coc.nvim/ && npm install && npm run build -- y && popd"
 returned_value = os.system(cmd)
