@@ -20,7 +20,7 @@ if !exists("g:chat_gpt_model")
 endif
 
 if !exists("g:chat_gpt_lang")
-  let g:chat_gpt_lang = ''
+  let g:chat_gpt_lang = v:none
 endif
 
 if !exists("g:chat_gpt_split_direction")
@@ -33,6 +33,10 @@ endif
 
 if !exists("g:chat_persona")
   let g:chat_persona = 'default'
+endif
+
+if !exists("g:chat_gpt_stop")
+  let g:chat_gpt_stop = v:none
 endif
 
 let code_wrapper_snippet = "Given the following code snippet: "
@@ -78,6 +82,7 @@ function! DisplayChatGPTResponse(response, finish_reason, chat_gpt_session_id)
     call setbufvar(chat_gpt_session_id, '&swapfile', 0)
     setlocal modifiable
     setlocal wrap
+    setlocal linebreak
     call setbufvar(chat_gpt_session_id, '&ft', 'markdown')
     call setbufvar(chat_gpt_session_id, '&syntax', 'markdown')
   endif
@@ -168,12 +173,14 @@ def chat_gpt(prompt):
     "gpt-4-turbo-preview": 128000,
     "gpt-4-32k": 32768,
     "gpt-4o": 128000,
+    "gpt-4o-mini": 128000,
   }
 
   max_tokens = int(vim.eval('g:chat_gpt_max_tokens'))
   model = str(vim.eval('g:chat_gpt_model'))
   temperature = float(vim.eval('g:chat_gpt_temperature'))
   lang = str(vim.eval('g:chat_gpt_lang'))
+  stop = str(vim.eval('g:chat_gpt_stop'))
   resp = lang and f" And respond in {lang}." or ""
 
   personas = dict(vim.eval('g:gpt_personas'))
@@ -228,7 +235,7 @@ def chat_gpt(prompt):
         messages=messages,
         temperature=temperature,
         max_tokens=max_tokens,
-        stop='',
+        stop=stop,
         stream=True
     )
 
@@ -260,52 +267,59 @@ EOF
 endfunction
 
 " Function to send highlighted code to ChatGPT
-function! SendHighlightedCodeToChatGPT(ask, context)
-  let save_cursor = getcurpos()
+function! SendHighlightedCodeToChatGPT(ask, context) abort
+    let save_cursor = getcurpos()
+    let [current_line, current_col] = getcurpos()[1:2]
 
-  " Save the current yank register
-  let save_reg = @@
-  let save_regtype = getregtype('@')
+    " Save the current yank register and its type
+    let save_reg = @@
+    let save_regtype = getregtype('@')
 
-  let [line_start, col_start] = getpos("'<")[1:2]
-  let [line_end, col_end] = getpos("'>")[1:2]
+    let [line_start, col_start] = getpos("'<")[1:2]
+    let [line_end, col_end] = getpos("'>")[1:2]
 
-  " Yank the visually selected text into the unnamed register
-  execute 'normal! ' . line_start . 'G' . col_start . '|v' . line_end . 'G' . col_end . '|y'
+    " Check if a selection is made and if current position is within the selection
+    if (col_end - col_start > 0 || line_end - line_start > 0) &&
+       \ (current_line == line_start && current_col == col_start ||
+       \  current_line == line_end && current_col == col_end)
 
-  " Send the yanked text to ChatGPT
-  let yanked_text = ''
-  let syntax = &syntax
+        let current_line_start = line_start
+        let current_line_end = line_end
 
-  if (col_end - col_start > 0) || (line_end - line_start > 0)
-    let yanked_text = '```' . syntax . "\n" . @@ . "\n" . '```'
-  endif
-
-  let prompt = a:context . ' ' . "\n" . yanked_text
-
-  echo a:ask
-  if has_key(g:prompt_templates, a:ask)
-    let template  = g:prompt_templates[a:ask]
-
-    if len(yanked_text) > 0
-      let template = template
+        if current_line_start == line_start && current_line_end == line_end
+            execute 'normal! ' . line_start . 'G' . col_start . '|v' . line_end . 'G' . col_end . '|y'
+            let yanked_text = '```' . &syntax . "\n" . @@ . "\n" . '```'
+        else
+            let yanked_text = ''
+        endif
+    else
+        let yanked_text = ''
     endif
 
-    let prompt = template . "\n" . yanked_text . "\n" . a:context
-  endif
+    let prompt = a:context . ' ' . "\n"
 
-  call ChatGPT(prompt)
+    " Include yanked_text in the prompt if it's not empty
+    if !empty(yanked_text)
+        let prompt .= yanked_text . "\n"
+    endif
 
-  " Restore the original yank register
-  let @@ = save_reg
-  call setreg('@', save_reg, save_regtype)
-  let curpos = getcurpos()
-  call setpos("'<", curpos)
-  call setpos("'>", curpos)
-  call setpos('.', save_cursor)
+    echo a:ask
+    if has_key(g:prompt_templates, a:ask)
+        let prompt = g:prompt_templates[a:ask] . "\n" . prompt
+    endif
 
+    call ChatGPT(prompt)
+
+    " Restore the original yank register
+    let @@ = save_reg
+    call setreg('@', save_reg, save_regtype)
+
+    let curpos = getcurpos()
+    call setpos("'<", curpos)
+    call setpos("'>", curpos)
+    call setpos('.', save_cursor)
 endfunction
-"
+
 " Function to generate a commit message
 function! GenerateCommitMessage()
   " Save the current position and yank register
@@ -371,7 +385,6 @@ function! ChatGPTMenu() range
         \ })
 endfunction
 
-" Expose mappings
 vnoremap <silent> <Plug>(chatgpt-menu) :call ChatGPTMenu()<CR>
 
 function! Capitalize(str)
@@ -379,7 +392,6 @@ function! Capitalize(str)
 endfunction
 
 for i in range(len(g:promptKeys))
-  " Commands to interact with ChatGPT
   execute 'command! -range -nargs=? ' . Capitalize(g:promptKeys[i]) . " call SendHighlightedCodeToChatGPT('" . g:promptKeys[i] . "',<q-args>)"
 endfor
 

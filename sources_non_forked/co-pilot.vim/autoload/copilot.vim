@@ -1,6 +1,6 @@
 scriptencoding utf-8
 
-let s:has_nvim_ghost_text = has('nvim-0.6') && exists('*nvim_buf_get_mark')
+let s:has_nvim_ghost_text = has('nvim-0.7') && exists('*nvim_buf_get_mark')
 let s:vim_minimum_version = '9.0.0185'
 let s:has_vim_ghost_text = has('patch-' . s:vim_minimum_version) && has('textprop')
 let s:has_ghost_text = s:has_nvim_ghost_text || s:has_vim_ghost_text
@@ -69,16 +69,8 @@ function! copilot#RunningClient() abort
   endif
 endfunction
 
-function! s:NodeVersionWarning() abort
-  if exists('s:client.node_version_warning')
-    echohl WarningMsg
-    echo 'Warning:' s:client.node_version_warning
-    echohl NONE
-  endif
-endfunction
-
-if has('nvim-0.6') && !has(luaeval('vim.version().api_prerelease') ? 'nvim-0.7.1' : 'nvim-0.7.0')
-  let s:editor_warning = 'Neovim 0.6 support is deprecated and will be dropped in a future release of copilot.vim.'
+if has('nvim-0.7') && !has(luaeval('vim.version().api_prerelease') ? 'nvim-0.8.1' : 'nvim-0.8.0')
+  let s:editor_warning = 'Neovim 0.7 support is deprecated and will be dropped in a future release of copilot.vim.'
 endif
 if has('vim_starting') && exists('s:editor_warning')
   call copilot#logger#Warn(s:editor_warning)
@@ -648,7 +640,6 @@ function! s:commands.status(opts) abort
 
   echo 'Copilot: Ready'
   call s:EditorVersionWarning()
-  call s:NodeVersionWarning()
 endfunction
 
 function! s:commands.signout(opts) abort
@@ -775,7 +766,6 @@ function! s:commands.version(opts) abort
     echo 'UNIX'
   endif
   call s:EditorVersionWarning()
-  call s:NodeVersionWarning()
 endfunction
 
 function! s:UpdateEditorConfiguration() abort

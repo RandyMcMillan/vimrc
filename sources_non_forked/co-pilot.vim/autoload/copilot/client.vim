@@ -26,15 +26,6 @@ function! s:Warn(msg) abort
   echohl NONE
 endfunction
 
-let s:node_target = '18.x or newer'
-function! s:UpgradeNodeMsg(node) abort
-  if get(a:node, 0, 'node') ==# 'node'
-    return 'Upgrade to ' . s:node_target
-  else
-    return 'Change g:copilot_node_command to ' . s:node_target
-  endif
-endfunction
-
 function! s:VimClose() dict abort
   if !has_key(self, 'job')
     return
@@ -387,8 +378,10 @@ function! s:OnExit(instance, code, ...) abort
     call remove(a:instance, 'client_id')
   endif
   let message = 'Process exited with status ' . a:code
-  if a:code == 2
-    let message = 'Node.js too old.  ' . s:UpgradeNodeMsg(a:instance.node)
+  if a:code >= 18 && a:code < 100
+    let message = 'Node.js too old.  ' .
+          \ (get(a:instance.node, 0, 'node') ==# 'node' ? 'Upgrade' : 'Change g:copilot_node_command') .
+          \ ' to ' . a:code . '.x or newer'
   endif
   if !has_key(a:instance, 'serverInfo') && !has_key(a:instance, 'startup_error')
     let a:instance.startup_error = message
@@ -496,7 +489,7 @@ endfunction
 
 let s:script_name = 'dist/language-server.js'
 function! s:Command() abort
-  if !has('nvim-0.6') && v:version < 900
+  if !has('nvim-0.7') && v:version < 900
     return [[], [], 'Vim version too old']
   endif
   let script = get(g:, 'copilot_command', '')
@@ -566,10 +559,6 @@ function! s:PostInit(result, instance) abort
   let a:instance.serverInfo = get(a:result, 'serverInfo', {})
   if !has_key(a:instance, 'node_version') && has_key(a:result.serverInfo, 'nodeVersion')
     let a:instance.node_version = a:result.serverInfo.nodeVersion
-    if a:instance.node_version =~# '^1[67]\.'
-      let a:instance.node_version_warning = 'Node.js ' . a:instance.node_version . ' support will soon be dropped.  ' . s:UpgradeNodeMsg(a:instance.node)
-      call s:Warn(a:instance.node_version_warning)
-    endif
   endif
   let a:instance.AfterInitialized = function('copilot#util#Defer')
   for Fn in remove(a:instance, 'after_initialized')
@@ -686,21 +675,21 @@ function! copilot#client#New(...) abort
   endfor
   if has('nvim')
     call extend(instance, {
-        \ 'Close': function('s:NvimClose'),
-        \ 'Notify': function('s:NvimNotify'),
-        \ 'Request': function('s:NvimRequest'),
-        \ 'Attach': function('s:NvimAttach'),
-        \ 'IsAttached': function('s:NvimIsAttached'),
-        \ })
+          \ 'Close': function('s:NvimClose'),
+          \ 'Notify': function('s:NvimNotify'),
+          \ 'Request': function('s:NvimRequest'),
+          \ 'Attach': function('s:NvimAttach'),
+          \ 'IsAttached': function('s:NvimIsAttached'),
+          \ })
     let instance.client_id = eval("v:lua.require'_copilot'.lsp_start_client(command, keys(instance.methods), opts, settings)")
     let instance.id = instance.client_id
   else
     call extend(instance, {
-        \ 'Close': function('s:VimClose'),
-        \ 'Notify': function('s:VimNotify'),
-        \ 'Attach': function('s:VimAttach'),
-        \ 'IsAttached': function('s:VimIsAttached'),
-        \ })
+          \ 'Close': function('s:VimClose'),
+          \ 'Notify': function('s:VimNotify'),
+          \ 'Attach': function('s:VimAttach'),
+          \ 'IsAttached': function('s:VimIsAttached'),
+          \ })
     let state = {'headers': {}, 'mode': 'headers', 'buffer': ''}
     let instance.open_buffers = {}
     let instance.methods = extend(s:vim_handlers, instance.methods)
