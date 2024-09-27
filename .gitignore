@@ -1,5 +1,6 @@
 temp_dirs/undodir/*
 sources_non_forked/ack.vim/.netrwhist
+sources_non_forked/coc-rust-analyzer
 temp_dirs/yankring_history_v2.txt
 sources_forked/yankring/doc/tags
 sources_non_forked/tlib/doc/tags
