@@ -17,6 +17,12 @@ if has("autocmd")
 endif
 
 if has("autocmd")
+    " rust.rs files
+    au BufRead,BufNewFile *.rs set list
+    au BufRead,BufNewFile *.rs set noexpandtab
+endif
+
+if has("autocmd")
     " configure expanding of tabs for various file types
     au BufRead,BufNewFile *.py set expandtab
     au BufRead,BufNewFile *.py set list
