@@ -1,3 +1,7 @@
+bash_profile.log
+sources_non_forked/vim-snipmate/doc/SnipMate.txt
+template
+
 temp_dirs/undodir/*
 sources_non_forked/ack.vim/.netrwhist
 sources_non_forked/coc-rust-analyzer
