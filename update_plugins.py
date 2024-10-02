@@ -22,8 +22,8 @@ cmd = "git --version"
 returned_value = os.system(cmd)
 cmd = "type -P node || curl -sL install-node.vercel.app/lts | bash -s -- -f"
 returned_value = os.system(cmd)
-cmd = "pushd sources_non_forked/coc.nvim/ && npm install && npm run build -- y && popd"
-cmd = "pushd sources_non_forked/coc.nvim/ && npm install && npm ci && popd"
+cmd = "pushd sources_non_forked/coc-rust-analyzer  && npm install && npm run build -- y && popd"
+cmd = "pushd sources_non_forked/coc-rust-analyzer  && npm install && npm ci && popd"
 returned_value = os.system(cmd)
 cmd = "type -P rustup && rustup component add rust-analyzer"
 returned_value = os.system(cmd)
@@ -31,7 +31,7 @@ returned_value = os.system(cmd)
 # --- Globals ----------------------------------------------
 PLUGINS = """
 ## update manually - using script breaks build
-coc.nvim https://github.com/neoclide/coc.nvim
+## coc.nvim https://github.com/neoclide/coc.nvim
 coc-rust-analyzer https://github.com/fannheyward/coc-rust-analyzer
 vim-duckscript https://github.com/nastevens/vim-duckscript
 ## vim-chatgpt https://github.com/CoderCookE/vim-chatgpt
