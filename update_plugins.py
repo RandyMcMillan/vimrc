@@ -32,9 +32,9 @@ returned_value = os.system(cmd)
 PLUGINS = """
 ## update manually - using script breaks build
 ## coc.nvim https://github.com/neoclide/coc.nvim
-coc-rust-analyzer https://github.com/fannheyward/coc-rust-analyzer.git
+coc-rust-analyzer https://github.com/fannheyward/coc-rust-analyzer
 vim-duckscript https://github.com/nastevens/vim-duckscript
-vim-chatgpt https://github.com/CoderCookE/vim-chatgpt
+## vim-chatgpt https://github.com/CoderCookE/vim-chatgpt
 auto-pairs https://github.com/jiangmiao/auto-pairs
 ale https://github.com/dense-analysis/ale
 vim-yankstack https://github.com/maxbrunsfeld/vim-yankstack
