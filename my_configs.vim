@@ -88,7 +88,7 @@ set showcmd             " show (partial) command in status line
 " cyan      #2aa198  6/6 cyan      37 #00afaf 60 -35 -05  42 161 152 175  74  63
 " green     #859900  2/2 green     64 #5f8700 60 -20  65 133 153   0  68 100  60
 
-set colorcolumn=40,50,79,81,129,131,159,161,209,211
+" set colorcolumn=40,50,79,81,129,131,159,161,209,211
 if has("gui_running")
 set background=dark
 let g:solarized_termcolors=256
