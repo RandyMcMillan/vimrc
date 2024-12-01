@@ -9,6 +9,10 @@ autocmd! bufwritepost my_configs.vim source %
 filetype plugin on
 
 if has("autocmd")
+  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+endif
+
+if has("autocmd")
     autocmd BufNewFile,BufRead * if match(getline(1),"python") >= 0 | set filetype=python     | endif
     autocmd BufNewFile,BufRead * if match(getline(1),"node")   >= 0 | set filetype=javascript | endif
     autocmd BufNewFile,BufRead * if match(getline(1),"bash")   >= 0 | set filetype=bash       | endif
