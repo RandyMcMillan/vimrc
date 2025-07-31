@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-cd ~/.vim_runtime ||  git clone . ~/.vim_runtime
-cd ~/.vim_runtime && git stash || true
+cd ~/.vim_runtime || git clone . ~/.vim_runtime
+cd ~/.vim_runtime && git stash --include-untracked || true
 cd ~/.vim_runtime && git pull origin -f master:master
 cd ~/.vim_runtime && git stash pop || true
 
