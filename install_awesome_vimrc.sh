@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+git remote set-url origin git@github.com:randymcmillan/vimrc.git || true
+
 pushd ~/.vim_runtime || git clone . ~/.vim_runtime
 pushd ~/.vim_runtime && git stash --include-untracked || true
 pushd ~/.vim_runtime && git pull origin -f master:master
