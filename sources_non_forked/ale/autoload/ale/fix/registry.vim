@@ -192,6 +192,11 @@ let s:default_registry = {
 \       'suggested_filetypes': ['python'],
 \       'description': 'Tidy Python imports with pyflyby.',
 \   },
+\   'unimport': {
+\       'function': 'ale#fixers#unimport#Fix',
+\       'suggested_filetypes': ['python'],
+\       'description': 'unimport fixer',
+\   },
 \   'importjs': {
 \       'function': 'ale#fixers#importjs#Fix',
 \       'suggested_filetypes': ['javascript'],
@@ -452,6 +457,11 @@ let s:default_registry = {
 \       'suggested_filetypes': ['markdown'],
 \       'description': 'Fix markdown files with pandoc.',
 \   },
+\   'pymarkdown': {
+\       'function': 'ale#fixers#pymarkdown#Fix',
+\       'suggested_filetypes': ['markdown'],
+\       'description': 'Fix markdown files with pymarkdown.',
+\   },
 \   'shfmt': {
 \       'function': 'ale#fixers#shfmt#Fix',
 \       'suggested_filetypes': ['sh'],
@@ -667,6 +677,11 @@ let s:default_registry = {
 \       'suggested_filetypes': ['racket'],
 \       'description': 'Fix Racket files with raco fmt.',
 \   },
+\   'rescript_format': {
+\       'function': 'ale#fixers#rescript_format#Fix',
+\       'suggested_filetypes': ['rescript'],
+\       'description': 'Official formatter for ReScript.',
+\   },
 \   'ruff': {
 \       'function': 'ale#fixers#ruff#Fix',
 \       'suggested_filetypes': ['python'],
@@ -746,6 +761,11 @@ let s:default_registry = {
 \       'function': 'ale#fixers#verible_format#Fix',
 \       'suggested_filetypes': ['verilog'],
 \       'description': 'Formats verilog files using verible.',
+\   },
+\   'markdownlint': {
+\       'function': 'ale#fixers#markdownlint#Fix',
+\       'suggested_filetypes': ['markdown'],
+\       'description': 'Fix markdown files with markdownlint.',
 \   },
 \}
 

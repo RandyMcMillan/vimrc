@@ -28,10 +28,12 @@ CONTENTS                                                         *ale-contents*
   7. Linter/Fixer Options.................|ale-integration-options|
     7.1 Options for alex..................|ale-alex-options|
     7.2 Options for cspell................|ale-cspell-options|
-    7.3 Options for languagetool..........|ale-languagetool-options|
-    7.4 Options for write-good............|ale-write-good-options|
-    7.5 Options for redpen................|ale-redpen-options|
-    7.6 Other Linter/Fixer Options........|ale-other-integration-options|
+    7.3 Options for dprint................|ale-dprint-options|
+    7.4 Options for languagetool..........|ale-languagetool-options|
+    7.5 Options for write-good............|ale-write-good-options|
+    7.6 Options for redpen................|ale-redpen-options|
+    7.7 Options for vale..................|ale-vale-options|
+    7.8 Other Linter/Fixer Options........|ale-other-integration-options|
   8. Commands/Keybinds....................|ale-commands|
   9. API..................................|ale-api|
   10. Special Thanks......................|ale-special-thanks|
@@ -1620,10 +1622,21 @@ g:ale_lint_delay
   A buffer-local option, `b:ale_lint_delay`, can be set to change the delay
   for different buffers, such as in |ftplugin| files.
 
+                                                    *ale-options.ale_lint_diff*
+                                                              *g:ale_lint_diff*
+g:ale_lint_diff
+
+  Type: |Number|
+  Default: `0`
+
+  When this option is set to `1`, ALE will lint buffers where `&diff` is set.
+
+
                                                     *ale-options.lint_on_enter*
                                                           *g:ale_lint_on_enter*
 lint_on_enter
 g:ale_lint_on_enter
+
   Type: |Number|
   Default: `1`
 
@@ -2279,6 +2292,16 @@ g:ale_references_show_contents
 
   If set to `true` or `1`,  matches found by `:ALEFindReferences` will be
   shown with a preview of the matching line.
+
+                                               *ale-options.references_use_fzf*
+                                                     *g:ale_references_use_fzf*
+references_use_fzf
+g:ale_references_use_fzf
+  Type: |Boolean| or |Number|
+  Default: `false`
+
+  If set to `true` or `1`,  matches found by `:ALEFindReferences` will be
+  always shown using |fzf-vim| (https://github.com/junegunn/fzf.vim).
 
                                  *ale-options.rename_tsserver_find_in_comments*
                                        *g:ale_rename_tsserver_find_in_comments*
@@ -3349,7 +3372,31 @@ g:ale_redpen_options
 
 
 -------------------------------------------------------------------------------
-7.7. Other Linter/Fixer Options                 *ale-other-integration-options*
+7.7. Options for vale                                        *ale-vale-options*
+
+  The following options can be used to configure the `vale` linter for text
+  files.
+
+g:ale_text_vale_executable                         *g:ale_text_vale_executable*
+  Type: String
+  Default: 'vale'
+
+  This option controls which executable is used for running Vale. Set it to an
+  absolute path or a different command name if needed.
+
+g:ale_text_vale_options                               *g:ale_text_vale_options*
+  Type: String
+  Default: ''
+
+  Extra command-line options to pass to the Vale executable.
+
+  Example:
+
+    let g:ale_text_vale_options = '--minAlertLevel=warning'
+
+
+-------------------------------------------------------------------------------
+7.8. Other Linter/Fixer Options                 *ale-other-integration-options*
 
 ALE supports a very wide variety of tools. Other linter or fixer options are
 documented in additional help files.
@@ -3490,6 +3537,7 @@ documented in additional help files.
     credo.................................|ale-elixir-credo|
     cspell................................|ale-elixir-cspell|
     lexical...............................|ale-elixir-lexical|
+    expert................................|ale-elixir-expert|
   elm.....................................|ale-elm-options|
     elm-format............................|ale-elm-elm-format|
     elm-ls................................|ale-elm-elm-ls|
@@ -3530,6 +3578,7 @@ documented in additional help files.
     gobuild...............................|ale-go-gobuild|
     gofmt.................................|ale-go-gofmt|
     gofumpt...............................|ale-go-gofumpt|
+    goimports.............................|ale-go-goimports|
     golangci-lint.........................|ale-go-golangci-lint|
     golangserver..........................|ale-go-golangserver|
     golines...............................|ale-go-golines|
@@ -3586,6 +3635,7 @@ documented in additional help files.
     prettier..............................|ale-html-prettier|
     rustywind.............................|ale-html-rustywind|
     stylelint.............................|ale-html-stylelint|
+    superhtml.............................|ale-html-superhtml|
     tidy..................................|ale-html-tidy|
     vscodehtml............................|ale-html-vscode|
     write-good............................|ale-html-write-good|
@@ -3634,6 +3684,7 @@ documented in additional help files.
     xo....................................|ale-javascript-xo|
   jinja...................................|ale-jinja-options|
     djlint................................|ale-jinja-djlint|
+    j2lint................................|ale-jinja-j2lint|
   json....................................|ale-json-options|
     biome.................................|ale-json-biome|
     clang-format..........................|ale-json-clangformat|
@@ -3849,6 +3900,9 @@ documented in additional help files.
     cspell................................|ale-rego-cspell|
     opacheck..............................|ale-rego-opa-check|
     opafmt................................|ale-rego-opa-fmt-fixer|
+  rescript................................|ale-rescript-options|
+    rescript-language-server..............|ale-rescript-language-server|
+    rescript_format.......................|ale-rescript-format|
   rest....................................|ale-rest-options|
     kulala_fmt............................|ale-rest-kulala_fmt|
   restructuredtext........................|ale-restructuredtext-options|
@@ -4082,12 +4136,18 @@ documented in additional help files.
   `:ALEFindReferences -vsplit`    - Open the location in a vertical split.
   `:ALEFindReferences -quickfix`  - Put the locations into quickfix list.
   `:ALEFindReferences -contents`  - Show line contents for matches.
+  `:ALEFindReferences -fzf`       - Show matches/previews using |fzf-vim|.
 
   The default method used for navigating to a new location can be changed
   by modifying |g:ale_default_navigation|.
 
   The default behaviour on whether to show line content for matches can
   be changed by modifying |g:ale_references_show_contents|.
+
+  The default behaviour on whether to use `fzf` to show matches/file previews
+  can be changed by modifying |g:ale_references_use_fzf|. `-fzf` can be combined
+  with  `-tab`, `-split`, `-vsplit`, `-quickfix` and `-relative`, while line
+  contents/file previews are always shown.
 
   You can add `-relative` to the command to view results with relatives paths,
   instead of absolute paths. This option has no effect if `-quickfix` is used.

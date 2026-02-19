@@ -190,6 +190,7 @@ formatting.
   * [dialyxir](https://github.com/jeremyjh/dialyxir)
   * [dogma](https://github.com/lpil/dogma) :floppy_disk:
   * [elixir-ls](https://github.com/elixir-lsp/elixir-ls) :warning: :speech_balloon:
+  * [expert](https://github.com/elixir-lang/expert) :warning: :speech_balloon:
   * [lexical](https://github.com/lexical-lsp/lexical) :warning: :speech_balloon:
   * [mix](https://hexdocs.pm/mix/Mix.html) :warning: :floppy_disk:
 * Elm
@@ -299,6 +300,7 @@ formatting.
   * [prettier](https://github.com/prettier/prettier)
   * [proselint](http://proselint.com/)
   * [rustywind](https://github.com/avencera/rustywind)
+  * [superhtml](https://github.com/kristoff-it/superhtml)
   * [tidy](http://www.html-tidy.org/)
   * [write-good](https://github.com/btford/write-good)
 * HTML Angular
@@ -346,6 +348,7 @@ formatting.
   * [xo](https://github.com/sindresorhus/xo)
 * Jinja
   * [djlint](https://djlint.com/)
+  * [j2lint](https://github.com/aristanetworks/j2lint/)
 * JSON
   * [VSCode JSON language server](https://github.com/hrsh7th/vscode-langservers-extracted)
   * [biome](https://biomejs.dev/)
@@ -418,7 +421,7 @@ formatting.
   * [pandoc](https://pandoc.org)
   * [prettier](https://github.com/prettier/prettier)
   * [proselint](http://proselint.com/)
-  * [pymarkdown](https://github.com/jackdewinter/pymarkdown)
+  * [pymarkdown](https://github.com/jackdewinter/pymarkdown) :floppy_disk:
   * [redpen](http://redpen.cc/)
   * [remark-lint](https://github.com/wooorm/remark-lint)
   * [textlint](https://textlint.github.io/)
@@ -589,6 +592,9 @@ formatting.
   * [cspell](https://github.com/streetsidesoftware/cspell/tree/main/packages/cspell)
   * [opacheck](https://www.openpolicyagent.org/docs/latest/cli/#opa-check)
   * [opafmt](https://www.openpolicyagent.org/docs/latest/cli/#opa-fmt)
+* ReScript
+  * [rescript-language-server](https://www.npmjs.com/package/@rescript/language-server) :speech_balloon:
+  * [rescript_format](https://rescript-lang.org/)
 * REST
   * [kulala_fmt](https://github.com/mistweaverco/kulala-fmt)
 * reStructuredText
