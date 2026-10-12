@@ -5,9 +5,10 @@
 let s:connections = get(s:, 'connections', {})
 let g:ale_lsp_next_message_id = 1
 
-" Given an id, which can be an executable or address, and a project path,
+" Given an id, which can be an executable or address, a project path,
+" and a language string or (bufnr) -> string function
 " create a new connection if needed. Return a unique ID for the connection.
-function! ale#lsp#Register(executable_or_address, project, init_options) abort
+function! ale#lsp#Register(executable_or_address, project, language, init_options) abort
     let l:conn_id = a:executable_or_address . ':' . a:project
 
     if !has_key(s:connections, l:conn_id)
@@ -22,12 +23,14 @@ function! ale#lsp#Register(executable_or_address, project, init_options) abort
         " config: Configuration settings to send to the server.
         " callback_list: A list of callbacks for handling LSP responses.
         " capabilities_queue: The list of callbacks to call with capabilities.
+        " dynamic_registrations: A map of dynamically registered capabilities.
         " capabilities: Features the server supports.
         let s:connections[l:conn_id] = {
         \   'id': l:conn_id,
         \   'is_tsserver': 0,
         \   'data': '',
         \   'root': a:project,
+        \   'language': a:language,
         \   'open_documents': {},
         \   'initialized': 0,
         \   'init_request_id': 0,
@@ -35,6 +38,8 @@ function! ale#lsp#Register(executable_or_address, project, init_options) abort
         \   'config': {},
         \   'callback_list': [],
         \   'init_queue': [],
+        \   'dynamic_registrations': {},
+        \   'static_pull_model': 0,
         \   'capabilities': {
         \       'hover': 0,
         \       'rename': 0,
@@ -45,6 +50,7 @@ function! ale#lsp#Register(executable_or_address, project, init_options) abort
         \       'definition': 0,
         \       'typeDefinition': 0,
         \       'implementation': 0,
+        \       'pull_model': 0,
         \       'symbol_search': 0,
         \       'code_actions': 0,
         \       'did_save': 0,
@@ -193,106 +199,258 @@ function! ale#lsp#ReadMessageData(data) abort
     return [l:remainder, l:response_list]
 endfunction
 
+function! s:UpdatePullModelCapability(conn) abort
+    let a:conn.capabilities.pull_model = get(a:conn, 'static_pull_model', 0)
+
+    if a:conn.capabilities.pull_model
+        return
+    endif
+
+    for l:registration in values(get(a:conn, 'dynamic_registrations', {}))
+        if get(l:registration, 'method', '') is# 'textDocument/diagnostic'
+            let l:options = get(l:registration, 'registerOptions', {})
+
+            if type(l:options) is v:t_dict
+            \&& type(get(l:options, 'interFileDependencies')) is v:t_bool
+                let a:conn.capabilities.pull_model = 1
+
+                return
+            endif
+        endif
+    endfor
+endfunction
+
 " Update capabilities from the server, so we know which features the server
 " supports.
-function! s:UpdateCapabilities(conn, capabilities) abort
+function! ale#lsp#UpdateCapabilities(conn_id, capabilities) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+
+    if empty(l:conn)
+        return
+    endif
+
     if type(a:capabilities) isnot v:t_dict
         return
     endif
 
     if get(a:capabilities, 'hoverProvider') is v:true
-        let a:conn.capabilities.hover = 1
+        let l:conn.capabilities.hover = 1
     endif
 
     if type(get(a:capabilities, 'hoverProvider')) is v:t_dict
-        let a:conn.capabilities.hover = 1
+        let l:conn.capabilities.hover = 1
     endif
 
     if get(a:capabilities, 'referencesProvider') is v:true
-        let a:conn.capabilities.references = 1
+        let l:conn.capabilities.references = 1
     endif
 
     if type(get(a:capabilities, 'referencesProvider')) is v:t_dict
-        let a:conn.capabilities.references = 1
+        let l:conn.capabilities.references = 1
     endif
 
     if get(a:capabilities, 'renameProvider') is v:true
-        let a:conn.capabilities.rename = 1
+        let l:conn.capabilities.rename = 1
     endif
 
     if type(get(a:capabilities, 'renameProvider')) is v:t_dict
-        let a:conn.capabilities.rename = 1
+        let l:conn.capabilities.rename = 1
     endif
 
     if get(a:capabilities, 'codeActionProvider') is v:true
-        let a:conn.capabilities.code_actions = 1
+        let l:conn.capabilities.code_actions = 1
     endif
 
     if type(get(a:capabilities, 'codeActionProvider')) is v:t_dict
-        let a:conn.capabilities.code_actions = 1
+        let l:conn.capabilities.code_actions = 1
     endif
 
-    if !empty(get(a:capabilities, 'completionProvider'))
-        let a:conn.capabilities.completion = 1
+    let l:completion = get(a:capabilities, 'completionProvider', v:false)
+
+    if type(l:completion) is v:t_dict || l:completion is v:true
+        let l:conn.capabilities.completion = 1
     endif
 
     if type(get(a:capabilities, 'completionProvider')) is v:t_dict
         let l:chars = get(a:capabilities.completionProvider, 'triggerCharacters')
 
         if type(l:chars) is v:t_list
-            let a:conn.capabilities.completion_trigger_characters = l:chars
+            let l:conn.capabilities.completion_trigger_characters = l:chars
         endif
     endif
 
     if get(a:capabilities, 'definitionProvider') is v:true
-        let a:conn.capabilities.definition = 1
+        let l:conn.capabilities.definition = 1
     endif
 
     if type(get(a:capabilities, 'definitionProvider')) is v:t_dict
-        let a:conn.capabilities.definition = 1
+        let l:conn.capabilities.definition = 1
     endif
 
     if get(a:capabilities, 'typeDefinitionProvider') is v:true
-        let a:conn.capabilities.typeDefinition = 1
+        let l:conn.capabilities.typeDefinition = 1
     endif
 
     if type(get(a:capabilities, 'typeDefinitionProvider')) is v:t_dict
-        let a:conn.capabilities.typeDefinition = 1
+        let l:conn.capabilities.typeDefinition = 1
     endif
 
     if get(a:capabilities, 'implementationProvider') is v:true
-        let a:conn.capabilities.implementation = 1
+        let l:conn.capabilities.implementation = 1
     endif
 
     if type(get(a:capabilities, 'implementationProvider')) is v:t_dict
-        let a:conn.capabilities.implementation = 1
+        let l:conn.capabilities.implementation = 1
+    endif
+
+    " Check if the language server supports pull model diagnostics.
+    if type(get(a:capabilities, 'diagnosticProvider')) is v:t_dict
+        if type(get(a:capabilities.diagnosticProvider, 'interFileDependencies')) is v:t_bool
+            let l:conn.static_pull_model = 1
+            call s:UpdatePullModelCapability(l:conn)
+        endif
     endif
 
     if get(a:capabilities, 'workspaceSymbolProvider') is v:true
-        let a:conn.capabilities.symbol_search = 1
+        let l:conn.capabilities.symbol_search = 1
     endif
 
     if type(get(a:capabilities, 'workspaceSymbolProvider')) is v:t_dict
-        let a:conn.capabilities.symbol_search = 1
+        let l:conn.capabilities.symbol_search = 1
     endif
 
     if type(get(a:capabilities, 'textDocumentSync')) is v:t_dict
         let l:syncOptions = get(a:capabilities, 'textDocumentSync')
 
         if get(l:syncOptions, 'save') is v:true
-            let a:conn.capabilities.did_save = 1
+            let l:conn.capabilities.did_save = 1
         endif
 
         if type(get(l:syncOptions, 'save')) is v:t_dict
-            let a:conn.capabilities.did_save = 1
+            let l:conn.capabilities.did_save = 1
 
             let l:saveOptions = get(l:syncOptions, 'save')
 
             if get(l:saveOptions, 'includeText') is v:true
-                let a:conn.capabilities.includeText = 1
+                let l:conn.capabilities.includeText = 1
             endif
         endif
     endif
+endfunction
+
+" Update capabilities registered dynamically with client/registerCapability.
+" Returns 1 when pull diagnostics were registered.
+function! ale#lsp#RegisterCapabilities(conn_id, registrations) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+
+    if empty(l:conn) || type(a:registrations) isnot v:t_list
+        return 0
+    endif
+
+    if !has_key(l:conn, 'dynamic_registrations')
+        let l:conn.dynamic_registrations = {}
+    endif
+
+    let l:registered_pull_diagnostics = 0
+
+    for l:registration in a:registrations
+        if type(l:registration) isnot v:t_dict
+            continue
+        endif
+
+        let l:id = get(l:registration, 'id', '')
+
+        if empty(l:id)
+            continue
+        endif
+
+        let l:conn.dynamic_registrations[l:id] = l:registration
+
+        if get(l:registration, 'method', '') is# 'textDocument/diagnostic'
+            let l:options = get(l:registration, 'registerOptions', {})
+
+            if type(l:options) is v:t_dict
+            \&& type(get(l:options, 'interFileDependencies')) is v:t_bool
+                let l:registered_pull_diagnostics = 1
+            endif
+        endif
+    endfor
+
+    call s:UpdatePullModelCapability(l:conn)
+
+    return l:registered_pull_diagnostics
+endfunction
+
+" Update capabilities removed dynamically with client/unregisterCapability.
+" The LSP spec names the list "unregisterations".
+function! ale#lsp#UnregisterCapabilities(conn_id, unregisterations) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+
+    if empty(l:conn) || type(a:unregisterations) isnot v:t_list
+        return 0
+    endif
+
+    if !has_key(l:conn, 'dynamic_registrations')
+        let l:conn.dynamic_registrations = {}
+    endif
+
+    let l:unregistered_pull_diagnostics = 0
+
+    for l:unregistration in a:unregisterations
+        if type(l:unregistration) isnot v:t_dict
+            continue
+        endif
+
+        let l:id = get(l:unregistration, 'id', '')
+        let l:method = get(l:unregistration, 'method', '')
+
+        if empty(l:id) || !has_key(l:conn.dynamic_registrations, l:id)
+            continue
+        endif
+
+        let l:registration = l:conn.dynamic_registrations[l:id]
+
+        if get(l:registration, 'method', '') isnot# l:method
+            continue
+        endif
+
+        if l:method is# 'textDocument/diagnostic'
+            let l:unregistered_pull_diagnostics = 1
+        endif
+
+        call remove(l:conn.dynamic_registrations, l:id)
+    endfor
+
+    call s:UpdatePullModelCapability(l:conn)
+
+    return l:unregistered_pull_diagnostics
+endfunction
+
+" Send textDocument/diagnostic requests for all open documents on a connection.
+" Returns a list of request details so callers can map responses back to URIs.
+function! ale#lsp#SendDiagnosticsForOpenDocuments(conn_id) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+    let l:request_list = []
+
+    if empty(l:conn) || !ale#lsp#HasCapability(a:conn_id, 'pull_model')
+        return l:request_list
+    endif
+
+    for l:buffer_string in sort(keys(l:conn.open_documents))
+        let l:buffer = str2nr(l:buffer_string)
+        let l:message = ale#lsp#message#Diagnostic(l:buffer)
+        let l:request_id = ale#lsp#Send(a:conn_id, l:message)
+
+        if l:request_id > 0
+            call add(l:request_list, {
+            \   'id': l:request_id,
+            \   'buffer': l:buffer,
+            \   'uri': l:message[2].textDocument.uri,
+            \})
+        endif
+    endfor
+
+    return l:request_list
 endfunction
 
 " Update a connection's configuration dictionary and notify LSP servers
@@ -313,13 +471,51 @@ function! ale#lsp#UpdateConfig(conn_id, buffer, config) abort
     return 1
 endfunction
 
+function! ale#lsp#GetConnectionConfig(conn_id) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+
+    return get(l:conn, 'config', {})
+endfunction
+
+" Send a JSON-RPC response to a server-initiated request (e.g. workspace/configuration).
+" Unlike ale#lsp#Send, which builds outgoing requests/notifications with a 'method' field,
+" this sends a response with 'id' + 'result' fields to reply to a request the server sent us.
+function! ale#lsp#SendResponse(conn_id, id, result) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+
+    if empty(l:conn)
+        return
+    endif
+
+    let l:body = json_encode({'jsonrpc': '2.0', 'id': a:id, 'result': a:result})
+    let l:data = 'Content-Length: ' . strlen(l:body) . "\r\n\r\n" . l:body
+    call s:SendMessageData(l:conn, l:data)
+endfunction
+
+function! ale#lsp#CallInitCallbacks(conn_id) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+
+    if !empty(l:conn)
+        " Ensure the connection is marked as initialized.
+        " For integration with Neovim's LSP tooling this ensures immediately
+        " call OnInit functions in Vim after the `on_init` callback is called.
+        let l:conn.initialized = 1
+
+        " Call capabilities callbacks queued for the project.
+        for l:Callback in l:conn.init_queue
+            call l:Callback()
+        endfor
+
+        let l:conn.init_queue = []
+    endif
+endfunction
 
 function! ale#lsp#HandleInitResponse(conn, response) abort
     if get(a:response, 'method', '') is# 'initialize'
         let a:conn.initialized = 1
     elseif type(get(a:response, 'result')) is v:t_dict
     \&& has_key(a:response.result, 'capabilities')
-        call s:UpdateCapabilities(a:conn, a:response.result.capabilities)
+        call ale#lsp#UpdateCapabilities(a:conn.id, a:response.result.capabilities)
 
         let a:conn.initialized = 1
     endif
@@ -331,12 +527,7 @@ function! ale#lsp#HandleInitResponse(conn, response) abort
     " The initialized message must be sent before everything else.
     call ale#lsp#Send(a:conn.id, ale#lsp#message#Initialized())
 
-    " Call capabilities callbacks queued for the project.
-    for l:Callback in a:conn.init_queue
-        call l:Callback()
-    endfor
-
-    let a:conn.init_queue = []
+    call ale#lsp#CallInitCallbacks(a:conn.id)
 endfunction
 
 function! ale#lsp#HandleMessage(conn_id, message) abort
@@ -373,6 +564,20 @@ function! ale#lsp#HandleMessage(conn_id, message) abort
             endfor
         endfor
     endif
+endfunction
+
+" Handle a JSON response from a language server.
+" This is called from Lua for integration with Neovim's LSP API.
+function! ale#lsp#HandleResponse(conn_id, response) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+
+    if empty(l:conn)
+        return
+    endif
+
+    for l:Callback in l:conn.callback_list
+        call ale#util#GetFunction(l:Callback)(a:conn_id, a:response)
+    endfor
 endfunction
 
 " Given a connection ID, mark it as a tsserver connection, so it will be
@@ -452,6 +657,10 @@ function! s:SendInitMessage(conn) abort
     \                   'dynamicRegistration': v:false,
     \                   'linkSupport': v:false,
     \               },
+    \               'diagnostic': {
+    \                   'dynamicRegistration': v:true,
+    \                   'relatedDocumentSupport': v:true,
+    \               },
     \               'publishDiagnostics': {
     \                   'relatedInformation': v:true,
     \               },
@@ -481,6 +690,29 @@ endfunction
 function! ale#lsp#StartProgram(conn_id, executable, command) abort
     let l:conn = s:connections[a:conn_id]
     let l:started = 0
+
+    if g:ale_use_neovim_lsp_api && !l:conn.is_tsserver
+        " For Windows from 'cmd /s/c "foo bar"' we need 'foo bar'
+        let l:lsp_cmd = has('win32') && type(a:command) is v:t_string
+        \   ? ['cmd', '/s/c', a:command[10:-2]]
+        \   : a:command
+
+        " Always call lsp.start, which will either create or re-use a
+        " connection. We'll set `attach` to `false` so we can later use
+        " our OpenDocument function to attach the buffer separately.
+        let l:client_id = luaeval('require("ale.lsp").start(_A)', {
+        \   'name': a:conn_id,
+        \   'cmd': l:lsp_cmd,
+        \   'root_dir': l:conn.root,
+        \   'init_options': l:conn.init_options,
+        \})
+
+        if l:client_id > 0
+            let l:conn.client_id = l:client_id
+        endif
+
+        return l:client_id > 0
+    endif
 
     if !has_key(l:conn, 'job_id') || !ale#job#HasOpenChannel(l:conn.job_id)
         let l:options = {
@@ -512,6 +744,21 @@ function! ale#lsp#StartProgram(conn_id, executable, command) abort
     return l:job_id > 0
 endfunction
 
+" Split an address into [host, port].
+" The port will either be a number or v:null.
+function! ale#lsp#SplitAddress(address) abort
+    let l:port_match = matchlist(a:address, '\v:(\d+)$')
+
+    if !empty(l:port_match)
+        let l:host = a:address[:-len(l:port_match[1]) - 2]
+        let l:port = l:port_match[1] + 0
+
+        return [l:host, l:port ? l:port : v:null]
+    endif
+
+    return [a:address, v:null]
+endfunction
+
 " Connect to an LSP server via TCP.
 "
 " 1 will be returned if the connection is running, or 0 if the connection could
@@ -520,7 +767,23 @@ function! ale#lsp#ConnectToAddress(conn_id, address) abort
     let l:conn = s:connections[a:conn_id]
     let l:started = 0
 
-    if !has_key(l:conn, 'channel_id') || !ale#socket#IsOpen(l:conn.channel_id)
+    if g:ale_use_neovim_lsp_api && !l:conn.is_tsserver
+        let [l:host, l:port] = ale#lsp#SplitAddress(a:address)
+
+        let l:client_id = luaeval('require("ale.lsp").start(_A)', {
+        \   'name': a:conn_id,
+        \   'host': l:host,
+        \   'port': l:port,
+        \   'root_dir': l:conn.root,
+        \   'init_options': l:conn.init_options,
+        \})
+
+        if l:client_id > 0
+            let l:conn.client_id = l:client_id
+        endif
+
+        return l:client_id > 0
+    elseif !has_key(l:conn, 'channel_id') || !ale#socket#IsOpen(l:conn.channel_id)
         let l:channel_id = ale#socket#Open(a:address, {
         \   'callback': {_, mess -> ale#lsp#HandleMessage(a:conn_id, mess)},
         \})
@@ -606,26 +869,53 @@ function! ale#lsp#Send(conn_id, message) abort
         throw 'LSP server not initialized yet!'
     endif
 
+    if g:ale_use_neovim_lsp_api && !l:conn.is_tsserver
+        return luaeval('require("ale.lsp").send_message(_A)', {
+        \   'client_id': l:conn.client_id,
+        \   'is_notification': a:message[0] == 1 ? v:true : v:false,
+        \   'method': a:message[1],
+        \   'params': get(a:message, 2, v:null)
+        \})
+    endif
+
     let [l:id, l:data] = ale#lsp#CreateMessageData(a:message)
     call s:SendMessageData(l:conn, l:data)
 
     return l:id == 0 ? -1 : l:id
 endfunction
 
+function! ale#lsp#GetLanguage(conn_id, buffer) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+    let l:Language = get(l:conn, 'language')
+
+    if empty(l:Language)
+        return getbufvar(a:buffer, '&filetype')
+    endif
+
+    return type(l:Language) is v:t_func ? l:Language(a:buffer) : l:Language
+endfunction
+
 " Notify LSP servers or tsserver if a document is opened, if needed.
 " If a document is opened, 1 will be returned, otherwise 0 will be returned.
-function! ale#lsp#OpenDocument(conn_id, buffer, language_id) abort
+function! ale#lsp#OpenDocument(conn_id, buffer) abort
     let l:conn = get(s:connections, a:conn_id, {})
     let l:opened = 0
 
     if !empty(l:conn) && !has_key(l:conn.open_documents, a:buffer)
         if l:conn.is_tsserver
             let l:message = ale#lsp#tsserver_message#Open(a:buffer)
+            call ale#lsp#Send(a:conn_id, l:message)
+        elseif g:ale_use_neovim_lsp_api
+            call luaeval('require("ale.lsp").buf_attach(_A)', {
+            \    'bufnr': a:buffer,
+            \    'client_id': l:conn.client_id,
+            \})
         else
-            let l:message = ale#lsp#message#DidOpen(a:buffer, a:language_id)
+            let l:language_id = ale#lsp#GetLanguage(a:conn_id, a:buffer)
+            let l:message = ale#lsp#message#DidOpen(a:buffer, l:language_id)
+            call ale#lsp#Send(a:conn_id, l:message)
         endif
 
-        call ale#lsp#Send(a:conn_id, l:message)
         let l:conn.open_documents[a:buffer] = getbufvar(a:buffer, 'changedtick')
         let l:opened = 1
     endif
@@ -649,11 +939,17 @@ function! ale#lsp#CloseDocument(buffer) abort
         if l:conn.initialized && has_key(l:conn.open_documents, a:buffer)
             if l:conn.is_tsserver
                 let l:message = ale#lsp#tsserver_message#Close(a:buffer)
+                call ale#lsp#Send(l:conn_id, l:message)
+            elseif g:ale_use_neovim_lsp_api
+                call luaeval('require("ale.lsp").buf_detach(_A)', {
+                \    'bufnr': a:buffer,
+                \    'client_id': l:conn.client_id,
+                \})
             else
                 let l:message = ale#lsp#message#DidClose(a:buffer)
+                call ale#lsp#Send(l:conn_id, l:message)
             endif
 
-            call ale#lsp#Send(l:conn_id, l:message)
             call remove(l:conn.open_documents, a:buffer)
             let l:closed = 1
         endif
@@ -715,4 +1011,34 @@ function! ale#lsp#HasCapability(conn_id, capability) abort
     endif
 
     return l:conn.capabilities[a:capability]
+endfunction
+
+" Get the completion trigger characters for a connection.
+function! ale#lsp#GetCompletionTriggerCharacters(conn_id) abort
+    let l:conn = get(s:connections, a:conn_id, {})
+
+    if empty(l:conn)
+        return []
+    endif
+
+    return get(l:conn.capabilities, 'completion_trigger_characters', [])
+endfunction
+
+" Get all completion trigger characters from LSPs active for a buffer.
+function! ale#lsp#GetAllCompletionTriggerCharactersForBuffer(buffer) abort
+    let l:all_triggers = []
+
+    for l:conn in values(s:connections)
+        if has_key(l:conn.open_documents, a:buffer)
+            let l:triggers = get(l:conn.capabilities, 'completion_trigger_characters', [])
+
+            for l:char in l:triggers
+                if index(l:all_triggers, l:char) < 0
+                    call add(l:all_triggers, l:char)
+                endif
+            endfor
+        endif
+    endfor
+
+    return l:all_triggers
 endfunction

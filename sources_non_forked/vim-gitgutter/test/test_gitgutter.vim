@@ -1278,6 +1278,24 @@ function Test_assume_unchanged()
 endfunction
 
 
+function Test_buffilepost_throw_concatenation()
+  doautocmd BufFilePre
+  new
+  doautocmd BufFilePre
+
+  let caught = ''
+  try
+    doautocmd BufFilePost
+  catch
+    let caught = v:exception
+  endtry
+
+  call assert_match('gitgutter rename error', caught)
+
+  bdelete!
+endfunction
+
+
 function Test_clean_smudge_filter()
   call system("git config --local include.path ../.gitconfig")
   call system("rm fixture.foo && git checkout fixture.foo")

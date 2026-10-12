@@ -16,7 +16,7 @@ onoremap <silent> <Plug>(ale_show_completion_menu) <Nop>
 let g:ale_completion_delay = get(g:, 'ale_completion_delay', 100)
 let g:ale_completion_excluded_words = get(g:, 'ale_completion_excluded_words', [])
 let g:ale_completion_max_suggestions = get(g:, 'ale_completion_max_suggestions', 50)
-let g:ale_completion_autoimport = get(g:, 'ale_completion_autoimport', 1)
+let g:ale_completion_autoimport = get(g:, 'ale_completion_autoimport', v:true)
 let g:ale_completion_tsserver_remove_warnings = get(g:, 'ale_completion_tsserver_remove_warnings', 0)
 
 let s:timer_id = -1
@@ -145,6 +145,7 @@ let s:omni_start_map = {
 
 " A map of exact characters for triggering LSP completions. Do not forget to
 " update self.input_patterns in ale.py in updating entries in this map.
+" These are used as a fallback when LSP servers don't provide trigger chars.
 let s:trigger_character_map = {
 \   '<default>': ['.'],
 \   'typescript': ['.', '''', '"'],
@@ -152,6 +153,19 @@ let s:trigger_character_map = {
 \   'cpp': ['.', '::', '->'],
 \   'c': ['.', '->'],
 \}
+
+" Get trigger characters, preferring LSP-provided ones over hardcoded.
+function! s:GetTriggerCharacters(filetype, conn_id) abort
+    if !empty(a:conn_id)
+        let l:lsp_triggers = ale#lsp#GetCompletionTriggerCharacters(a:conn_id)
+
+        if !empty(l:lsp_triggers)
+            return l:lsp_triggers
+        endif
+    endif
+
+    return s:GetFiletypeValue(s:trigger_character_map, a:filetype)
+endfunction
 
 function! s:GetFiletypeValue(map, filetype) abort
     for l:part in reverse(split(a:filetype, '\.'))
@@ -175,15 +189,32 @@ function! ale#completion#GetPrefix(filetype, line, column) abort
     "   abc
     "      ^
     " So we need check the text in the column before that position.
-    return matchstr(getline(a:line)[: a:column - 2], l:regex)
+    let l:line_text = getline(a:line)[: a:column - 2]
+    let l:prefix = matchstr(l:line_text, l:regex)
+
+    if !empty(l:prefix)
+        return l:prefix
+    endif
+
+    " Check LSP trigger characters for active connections on this buffer.
+    let l:triggers = ale#lsp#GetAllCompletionTriggerCharactersForBuffer(bufnr(''))
+
+    for l:char in l:triggers
+        if l:line_text[-len(l:char):] is# l:char
+            return l:char
+        endif
+    endfor
+
+    return ''
 endfunction
 
-function! ale#completion#GetTriggerCharacter(filetype, prefix) abort
+function! ale#completion#GetTriggerCharacter(filetype, prefix, ...) abort
     if empty(a:prefix)
         return ''
     endif
 
-    let l:char_list = s:GetFiletypeValue(s:trigger_character_map, a:filetype)
+    let l:conn_id = get(a:, 1, '')
+    let l:char_list = s:GetTriggerCharacters(a:filetype, l:conn_id)
 
     if index(l:char_list, a:prefix) >= 0
         return a:prefix
@@ -204,7 +235,8 @@ function! ale#completion#Filter(
     if empty(a:prefix)
         let l:filtered_suggestions = a:suggestions
     else
-        let l:triggers = s:GetFiletypeValue(s:trigger_character_map, a:filetype)
+        let l:conn_id = get(get(b:, 'ale_completion_info', {}), 'conn_id', '')
+        let l:triggers = s:GetTriggerCharacters(a:filetype, l:conn_id)
 
         " For completing...
         "   foo.
@@ -394,6 +426,7 @@ function! ale#completion#Show(result) abort
         if g:ale_enabled
         \&& (
         \   l:text_changed is# '1'
+        \   || g:ale_lint_on_text_changed is v:true
         \   || l:text_changed is# 'always'
         \   || l:text_changed is# 'normal'
         \   || l:text_changed is# 'insert'
@@ -510,7 +543,7 @@ function! ale#completion#ParseTSServerCompletionEntryDetails(response) abort
         \   'icase': 1,
         \   'menu': join(l:displayParts, ''),
         \   'dup': get(l:info, 'additional_edits_only', 0)
-        \       ||  g:ale_completion_autoimport,
+        \       || (g:ale_completion_autoimport + 0),
         \   'info': join(l:documentationParts, ''),
         \}
         " This flag is used to tell if this completion came from ALE or not.
@@ -625,7 +658,7 @@ function! ale#completion#ParseLSPCompletions(response) abort
         \   'icase': 1,
         \   'menu': l:detail,
         \   'dup': get(l:info, 'additional_edits_only', 0)
-        \       ||  g:ale_completion_autoimport,
+        \       || (g:ale_completion_autoimport + 0),
         \   'info': (type(l:doc) is v:t_string ? l:doc : ''),
         \}
         " This flag is used to tell if this completion came from ALE or not.
@@ -763,6 +796,9 @@ function! s:OnReady(linter, lsp_details) abort
     let l:id = a:lsp_details.connection_id
 
     if !ale#lsp#HasCapability(l:id, 'completion')
+        " Return at least an empty result to avoid OmniFunc timeout
+        call ale#completion#Show([])
+
         return
     endif
 
@@ -779,18 +815,15 @@ function! s:OnReady(linter, lsp_details) abort
     call ale#lsp#RegisterCallback(l:id, l:Callback)
 
     if a:linter.lsp is# 'tsserver'
-        if get(g:, 'ale_completion_tsserver_autoimport') is 1
-            " no-custom-checks
-            echom '`g:ale_completion_tsserver_autoimport` is deprecated. Use `g:ale_completion_autoimport` instead.'
-        endif
-
         let l:message = ale#lsp#tsserver_message#Completions(
         \   l:buffer,
         \   b:ale_completion_info.line,
         \   b:ale_completion_info.column,
         \   b:ale_completion_info.prefix,
-        \   get(b:ale_completion_info, 'additional_edits_only', 0)
-        \       || g:ale_completion_autoimport,
+        \   (
+        \       get(b:ale_completion_info, 'additional_edits_only', 0)
+        \       || g:ale_completion_autoimport
+        \   ) ? v:true : v:false,
         \)
     else
         " Send a message saying the buffer has changed first, otherwise
@@ -804,7 +837,7 @@ function! s:OnReady(linter, lsp_details) abort
         \   l:buffer,
         \   b:ale_completion_info.line,
         \   b:ale_completion_info.column,
-        \   ale#completion#GetTriggerCharacter(&filetype, b:ale_completion_info.prefix),
+        \   ale#completion#GetTriggerCharacter(&filetype, b:ale_completion_info.prefix, l:id),
         \)
     endif
 
@@ -947,9 +980,18 @@ function! ale#completion#OmniFunc(findstart, base) abort
     else
         let l:result = ale#completion#GetCompletionResult()
 
+        let l:timeout = get(g:, 'ale_completion_timeout', 3)
+        let l:timeout_start = reltime()
+
         while l:result is v:null && !complete_check()
             sleep 2ms
             let l:result = ale#completion#GetCompletionResult()
+
+            if reltimefloat(reltime(l:timeout_start)) > l:timeout
+                " no-custom-checks
+                echoerr 'no result within timeout (' . l:timeout . 's)'
+                break
+            endif
         endwhile
 
         return l:result isnot v:null ? l:result : []

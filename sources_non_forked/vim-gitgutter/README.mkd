@@ -26,7 +26,7 @@ Features:
 * Handles line endings correctly, even with repos that do CRLF conversion.
 * Handles clean/smudge filters.
 * Optional line highlighting.
-* Optional line number highlighting. (Only available in Neovim 0.3.2 or higher)
+* Optional line number highlighting. (Only available in Vim 8.2.3874 or Neovim 0.3.2 or higher)
 * Fully customisable (signs, sign column, line (number) highlights, mappings, extra git-diff arguments, etc).
 * Can be toggled on/off, globally or per buffer.
 * Preserves signs from other plugins.
@@ -81,7 +81,7 @@ Second, ensure your `updatetime` and `signcolumn` options are set appropriately.
 
 When you make a change to a file tracked by git, the diff markers should appear automatically after a short delay.  The delay is governed by vim's `updatetime` option; the default value is `4000`, i.e. 4 seconds, but I suggest reducing it to around 100ms (add `set updatetime=100` to your vimrc).  Note `updatetime` also controls the delay before vim writes its swap file (see `:help updatetime`).
 
-The `signcolumn` option can have any value except `'off'`.
+The `signcolumn` option can have any value except `'no'`.
 
 
 ### Windows
@@ -139,7 +139,7 @@ And you can turn line highlighting on and off (defaults to off):
 
 Note that if you have line highlighting on and signs off, you will have an empty sign column – more accurately, a sign column with invisible signs.  This is because line highlighting requires signs and Vim/NeoVim always shows the sign column when there are signs even if the signs are invisible.
 
-With Neovim 0.3.2 or higher, you can turn line number highlighting on and off (defaults to off):
+With Vim 8.2.3874 or Neovim 0.3.2 or higher, you can turn line number highlighting on and off (defaults to off):
 
 * turn on with `:GitGutterLineNrHighlightsEnable`
 * turn off with `:GitGutterLineNrHighlightsDisable`
@@ -297,7 +297,7 @@ You can customise:
 * How to handle non-gitgutter signs
 * The signs' colours and symbols
 * Line highlights
-* Line number highlights (only in Neovim 0.3.2 or higher)
+* Line number highlights (only in Vim 8.2.3874 or Neovim 0.3.2 or higher)
 * The diff syntax colours used in the preview window
 * The intra-line diff highlights used in the preview window
 * Whether the diff is relative to the index (default) or working tree.
@@ -395,7 +395,7 @@ highlight link GitGutterChangeLine DiffText
 
 #### Line number highlights
 
-NOTE: This feature requires Neovim 0.3.2 or higher.
+NOTE: This feature requires Vim 8.2.3874 or Neovim 0.3.2 or higher.
 
 Similarly to the signs' colours, set up the following highlight groups in your colorscheme or `~/.vimrc`:
 
@@ -490,16 +490,6 @@ let g:gitgutter_map_keys = 0
 
 See above for configuring maps for hunk-jumping and staging/undoing.
 
-
-#### Use a custom `grep` command
-
-If you use an alternative to grep, you can tell vim-gitgutter to use it here.
-
-```viml
-" Default:
-let g:gitgutter_grep = 'grep'
-```
-
 #### To turn off vim-gitgutter by default
 
 Add `let g:gitgutter_enabled = 0` to your `~/.vimrc`.
@@ -532,6 +522,8 @@ let g:gitgutter_async = 0
 #### To use floating/popup windows for hunk previews
 
 Add `let g:gitgutter_preview_win_floating = 1` to your `~/.vimrc`.  Note that on Vim this prevents you staging (partial) hunks via the preview window.
+
+On Neovim, the preview hunk command will move the cursor into the floating window if it is already open.
 
 
 #### The appearance of a floating/popup window for hunk previews
@@ -717,7 +709,6 @@ You can configure whether GitGutter preserves or clobbers other signs using `g:g
 
 Here are some things you can check:
 
-* Try adding `let g:gitgutter_grep=''` to your vimrc.  If it works, the problem is grep producing non-plain output; e.g. ANSI escape codes or colours.
 * Verify `:echo system("git --version")` succeeds.
 * Verify your git config is compatible with the version of git returned by the command above.
 * Verify your Vim supports signs (`:echo has('signs')` should give `1`).

@@ -263,7 +263,7 @@ function! s:hunk_op(op, ...)
   if gitgutter#utility#is_active(bufnr)
     " Get a (synchronous) diff.
     let [async, g:gitgutter_async] = [g:gitgutter_async, 0]
-    let diff = gitgutter#diff#run_diff(bufnr, g:gitgutter_diff_relative_to, 1)
+    let diff = gitgutter#diff#run_diff(bufnr, g:gitgutter_diff_relative_to)
     let g:gitgutter_async = async
 
     call gitgutter#hunk#set_hunks(bufnr, gitgutter#diff#parse_diff(diff))
@@ -359,6 +359,11 @@ endfunction
 
 
 function! s:preview(hunk_diff)
+  if g:gitgutter_preview_win_floating && exists('*nvim_set_current_win') && s:winid != 0
+    call nvim_set_current_win(s:winid)
+    return
+  endif
+
   let lines = split(a:hunk_diff, '\r\?\n')
   let header = lines[0:4]
   let body = lines[5:]
@@ -445,6 +450,11 @@ endfunction
 
 " Floating window: does not move cursor to floating window.
 " Preview window: moves cursor to preview window.
+"
+" Note the "diff" file type treats a line starting "--- " as a file header
+" instead of a removed line, thanks to the syntax group "diffNewFile".  We
+" want it to be treated as a removed line.  Since we never show headers in
+" the preview window it is safe to remove the offending syntax group.
 function! s:open_hunk_preview_window()
   let source_wrap = &wrap
   let source_window = winnr()
@@ -458,6 +468,13 @@ function! s:open_hunk_preview_window()
       let s:winid = nvim_open_win(buf, v:false, g:gitgutter_floating_window_options)
       call nvim_win_set_option(s:winid, 'wrap', source_wrap ? v:true : v:false)
       call nvim_buf_set_option(buf, 'filetype',  'diff')
+      if exists("*win_execute")
+        try
+          call win_execute(s:winid, "syntax clear diffNewFile", 1)
+        catch /E28/
+          " noop
+        endtry
+      endif
       call nvim_buf_set_option(buf, 'buftype',   'acwrite')
       call nvim_buf_set_option(buf, 'bufhidden', 'delete')
       call nvim_buf_set_option(buf, 'swapfile',  v:false)
@@ -484,6 +501,13 @@ function! s:open_hunk_preview_window()
       let s:winid = popup_create('', g:gitgutter_floating_window_options)
 
       call setbufvar(winbufnr(s:winid), '&filetype', 'diff')
+      if exists("*win_execute")
+        try
+          call win_execute(s:winid, "syntax clear diffNewFile", 1)
+        catch /E28/
+          " noop
+        endtry
+      endif
       call setwinvar(s:winid, '&wrap', source_wrap)
 
       return
@@ -506,6 +530,11 @@ function! s:open_hunk_preview_window()
     let s:preview_bufnr = bufnr('')
   endif
   setlocal filetype=diff buftype=acwrite bufhidden=delete
+  try
+    syntax clear diffNewFile
+  catch /E28/
+    " noop
+  endtry
   let &l:wrap = source_wrap
   let b:source_window = source_window
   " Reset some defaults in case someone else has changed them.
@@ -587,7 +616,7 @@ function! s:populate_hunk_preview_window(header, body)
       call matchaddpos(group, [[region[0], region[2], region[3]-region[2]+1]])
     endfor
 
-    1
+    normal! 1G0
   endif
 endfunction
 

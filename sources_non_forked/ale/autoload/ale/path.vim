@@ -1,6 +1,8 @@
 " Author: w0rp <devw0rp@gmail.com>
 " Description: Functions for working with paths in the filesystem.
 
+let s:is_windows = has('win32') || has('win64') || has('win32unix')
+
 " simplify a path, and fix annoying issues with paths on Windows.
 "
 " Forward slashes are changed to back slashes so path equality works better
@@ -27,7 +29,7 @@ endfunction
 " Simplify a path without a Windows drive letter.
 " This function can be used for checking if paths are equal.
 function! ale#path#RemoveDriveLetter(path) abort
-    return has('win32') && a:path[1:2] is# ':\'
+    return s:is_windows && a:path[1:2] =~# '^:[/\\]$'
     \   ? ale#path#Simplify(a:path[2:])
     \   : ale#path#Simplify(a:path)
 endfunction
@@ -41,7 +43,7 @@ function! ale#path#FindNearestFile(buffer, filename) abort
     let l:relative_path = findfile(a:filename, l:buffer_filename . ';')
 
     if !empty(l:relative_path)
-        return fnamemodify(l:relative_path, ':p')
+        return ale#path#Simplify(resolve(fnamemodify(l:relative_path, ':p')))
     endif
 
     return ''
@@ -56,7 +58,37 @@ function! ale#path#FindNearestDirectory(buffer, directory_name) abort
     let l:relative_path = finddir(a:directory_name, l:buffer_filename . ';')
 
     if !empty(l:relative_path)
-        return fnamemodify(l:relative_path, ':p')
+        return ale#path#Simplify(resolve(fnamemodify(l:relative_path, ':p')) . '/')
+    endif
+
+    return ''
+endfunction
+
+" Given a buffer and a filename, find the nearest file or directory by
+" searching upwards through the paths relative to the given buffer.
+function! ale#path#FindNearestFileOrDirectory(buffer, filename) abort
+    let l:buffer_filename = fnamemodify(bufname(a:buffer), ':p')
+    let l:buffer_filename = fnameescape(l:buffer_filename)
+
+    let l:relative_path_file = findfile(a:filename, l:buffer_filename . ';')
+    let l:relative_path_dir = finddir(a:filename, l:buffer_filename . ';')
+
+    " If we find both a file and directory, choose the shorter response by
+    " making the longer one empty instead.
+    if !empty(l:relative_path_file) && !empty(l:relative_path_dir)
+        if strlen(l:relative_path_file) > strlen(l:relative_path_dir)
+            let l:relative_path_dir = ''
+        else
+            let l:relative_path_file = ''
+        endif
+    endif
+
+    if !empty(l:relative_path_file)
+        return resolve(fnamemodify(l:relative_path_file, ':p'))
+    endif
+
+    if !empty(l:relative_path_dir)
+        return ale#path#Simplify(resolve(fnamemodify(l:relative_path_dir, ':p')) . '/')
     endif
 
     return ''
@@ -115,20 +147,30 @@ endfunction
 
 " Return 1 if a path is an absolute path.
 function! ale#path#IsAbsolute(filename) abort
-    if has('win32') && a:filename[:0] is# '\'
-        return 1
+    if s:is_windows
+        return a:filename[:0] =~# '[\\/]' || a:filename[0:2] =~? '[A-Z]:[/\\]'
+    else
+        return a:filename[:0] is# '/'
     endif
-
-    " Check for /foo and C:\foo, etc.
-    return a:filename[:0] is# '/' || a:filename[1:2] is# ':\'
 endfunction
 
 let s:temp_dir = ale#path#Simplify(fnamemodify(ale#util#Tempname(), ':h:h'))
 
+if s:temp_dir is# ale#path#Simplify(fnamemodify(s:temp_dir, ':h'))
+    " :h:h resolved to a root path; use :h instead.
+    let s:temp_dir = ale#path#Simplify(fnamemodify(ale#util#Tempname(), ':h'))
+endif
+
+let s:resolved_temp_dir = resolve(s:temp_dir)
+
 " Given a filename, return 1 if the file represents some temporary file
-" created by Vim.
+" created by Vim. If the temporary location is symlinked (e.g. macOS), some
+" linters may report the resolved version of the path, so both are checked.
 function! ale#path#IsTempName(filename) abort
-    return ale#path#Simplify(a:filename)[:len(s:temp_dir) - 1] is# s:temp_dir
+    let l:filename = ale#path#Simplify(a:filename)
+
+    return l:filename[:len(s:temp_dir) - 1] is# s:temp_dir
+    \|| l:filename[:len(s:resolved_temp_dir) - 1] is# s:resolved_temp_dir
 endfunction
 
 " Given a base directory, which must not have a trailing slash, and a
@@ -139,7 +181,7 @@ function! ale#path#GetAbsPath(base_directory, filename) abort
         return ale#path#Simplify(a:filename)
     endif
 
-    let l:sep = has('win32') ? '\' : '/'
+    let l:sep = s:is_windows ? '\' : '/'
 
     return ale#path#Simplify(a:base_directory . l:sep . a:filename)
 endfunction
@@ -152,7 +194,7 @@ function! ale#path#Dirname(path) abort
     endif
 
     " For /foo/bar/ we need :h:h to get /foo
-    if a:path[-1:] is# '/' || (has('win32') && a:path[-1:] is# '\')
+    if a:path[-1:] is# '/' || (s:is_windows && a:path[-1:] is# '\')
         return fnamemodify(a:path, ':h:h')
     endif
 
@@ -171,7 +213,7 @@ function! ale#path#IsBufferPath(buffer, complex_filename) abort
 
     let l:test_filename = ale#path#Simplify(a:complex_filename)
 
-    if l:test_filename[:1] is# './'
+    if l:test_filename[:1] is# './' || l:test_filename[:1] is# '.\'
         let l:test_filename = l:test_filename[2:]
     endif
 
@@ -185,7 +227,7 @@ function! ale#path#IsBufferPath(buffer, complex_filename) abort
         let l:test_filename = fnamemodify(l:test_filename, ':t')
     endif
 
-    let l:buffer_filename = expand('#' . a:buffer . ':p')
+    let l:buffer_filename = ale#path#Simplify(expand('#' . a:buffer . ':p'))
 
     return l:buffer_filename is# l:test_filename
     \   || l:buffer_filename[-len(l:test_filename):] is# l:test_filename
@@ -193,8 +235,8 @@ endfunction
 
 " Given a path, return every component of the path, moving upwards.
 function! ale#path#Upwards(path) abort
-    let l:pattern = has('win32') ? '\v/+|\\+' : '\v/+'
-    let l:sep = has('win32') ? '\' : '/'
+    let l:pattern = s:is_windows ? '\v/+|\\+' : '\v/+'
+    let l:sep = s:is_windows ? '\' : '/'
     let l:parts = split(ale#path#Simplify(a:path), l:pattern)
     let l:path_list = []
 
@@ -203,7 +245,7 @@ function! ale#path#Upwards(path) abort
         let l:parts = l:parts[:-2]
     endwhile
 
-    if has('win32') && a:path =~# '^[a-zA-z]:\'
+    if s:is_windows && a:path =~# '^[a-zA-z]:\'
         " Add \ to C: for C:\, etc.
         let l:path_list[-1] .= '\'
     elseif a:path[0] is# '/'
@@ -243,7 +285,7 @@ function! ale#path#FromFileURI(uri) abort
     let l:path = ale#uri#Decode(l:encoded_path)
 
     " If the path is like /C:/foo/bar, it should be C:\foo\bar instead.
-    if has('win32') && l:path =~# '^/[a-zA-Z][:|]'
+    if s:is_windows && l:path =~# '^/[a-zA-Z][:|]'
         let l:path = substitute(l:path[1:], '/', '\\', 'g')
         let l:path = l:path[0] . ':' . l:path[2:]
     endif
