@@ -10,3 +10,4 @@ export GIT
 	. install_awesome_vimrc.sh
 	$$GIT add sources_non_forked
 	$$GNOSTR legit -m sources_non_forked
+	$$GIT push origin
