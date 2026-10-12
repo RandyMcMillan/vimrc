@@ -4,3 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+gnostr = "^970861.1845.448495"
+gnostr-bins = { version = "^970398.1846.57265", features = ["chat", "crawler", "git", "legit", "p2p", "relay", "web"] }
