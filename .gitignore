@@ -8,5 +8,3 @@ my_plugins/
 my_configs.vim
 tags
 .DS_Store
-
-sources_non_forked
