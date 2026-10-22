@@ -88,13 +88,27 @@ function! MempoolFetch(...)
         execute l:target . 'wincmd w'
     endif
 
-    " Derive a writable file name for this endpoint
-    let l:safe = substitute(l:endpoint, '[^a-zA-Z0-9._-]', '_', 'g')
-    let l:safe = substitute(l:safe, '^_*', '', '')
-    if empty(l:safe)
-        let l:safe = 'mempool'
+    " Derive a writable file path: mempool/<blockheight>/<name>.json
+    let l:path = substitute(l:endpoint, '?[^?]*$', '', '')
+    let l:segments = split(l:path, '/')
+    let l:name = ''
+    for l:seg in reverse(copy(l:segments))
+        if l:seg !~# '^:' && !empty(l:seg)
+            let l:name = l:seg
+            break
+        endif
+    endfor
+    if empty(l:name)
+        let l:name = 'index'
     endif
-    let l:bufname = 'mempool_' . l:safe . '.json'
+    let l:height = get(g:, 'mempool_block_height', '')
+    if empty(l:height)
+        let l:height = 'latest'
+    endif
+    let l:dir = 'mempool' . '/' . l:height
+    let l:bufname = l:dir . '/' . l:name . '.json'
+    " Ensure the target directory exists so :w works
+    call mkdir(l:dir, 'p')
     let l:bufnr = MempoolBufnr(l:bufname)
 
     if l:bufnr != -1
