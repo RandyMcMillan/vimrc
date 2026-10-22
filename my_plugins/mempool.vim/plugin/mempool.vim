@@ -239,9 +239,8 @@ function! MempoolHelp()
         \ '  :MempoolTx <txid>',
         \ '  :MempoolAddress <address>',
         \ '',
-        \ 'Sources:',
-        \ '  g:mempool_api_url        (default: https://mempool.space/api)',
-        \ '  g:mempool_alt_api_url    (default: https://bitcoin.gob.sv/api)',
+        \ 'Source:',
+        \ '  https://mempool.space/api (alternate sources handled in background)',
         \ '',
         \ 'Available endpoints:',
         \ ]
@@ -264,10 +263,7 @@ command! -nargs=? -complete=customlist,MempoolComplete Mempool :call MempoolFetc
 command! MempoolTree :call MempoolTree()
 command! MempoolHelp :call MempoolHelp()
 
-" Fetch from an alternate data source (e.g., :MempoolAlt /v1/fees/recommended)
-command! -nargs=1 -complete=customlist,MempoolComplete MempoolAlt :call MempoolFetch(g:mempool_alt_api_url, <q-args>)
-command! -nargs=1 -complete=customlist,MempoolComplete MempoolGobSv :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, <q-args>)
-command! -nargs=1 -complete=customlist,MempoolComplete MempoolBitcoinGobSv :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, <q-args>)
+" Alternate data sources are handled internally (not exposed as commands)
 
 " Helper wrappers for common endpoints
 command! MempoolFees   :call MempoolFetch('/v1/fees/recommended')
@@ -276,11 +272,7 @@ command! MempoolBlocks :call MempoolFetch('/v1/blocks')
 command! -nargs=1 MempoolTx  :call MempoolFetch('/tx/' . <q-args>)
 command! -nargs=1 MempoolAddress :call MempoolFetch('/address/' . <q-args>)
 
-" Alternate source helper wrappers
-command! MempoolAltFees   :call MempoolFetch(g:mempool_alt_api_url, '/v1/fees/recommended')
-command! MempoolAltHeight :call MempoolFetch(g:mempool_alt_api_url, '/blocks/tip/height')
-command! MempoolGobSvFees   :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, '/v1/fees/recommended')
-command! MempoolGobSvHeight :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, '/blocks/tip/height')
+" Alternate source helpers are handled internally
 
 " ============================================================================
 " DEFAULT KEYBINDINGS
@@ -290,7 +282,6 @@ command! MempoolGobSvHeight :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, '/b
 nnoremap <silent> <leader>mpf :MempoolFees<CR>
 nnoremap <silent> <leader>mph :MempoolHeight<CR>
 nnoremap <silent> <leader>mpb :MempoolBlocks<CR>
-nnoremap <silent> <leader>mpa :MempoolAltFees<CR>
 nnoremap <silent> <leader>mpt :MempoolTree<CR>
 
 let g:mempool_endpoints = [
