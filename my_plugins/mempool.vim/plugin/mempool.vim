@@ -78,7 +78,7 @@ function! MempoolFetch(...)
         execute 'buffer ' . l:bufnr
     else
         enew
-        execute 'file ' . fnameescape(l:bufname)
+        silent execute 'file ' . fnameescape(l:bufname)
     endif
 
 
@@ -103,7 +103,7 @@ function! MempoolFetch(...)
     syntax enable
     setlocal filetype=json
 
-    echo 'Fetched: ' . l:full_url
+    silent echo 'Fetched: ' . l:full_url
 endfunction
 
 " Optional autoload-style wrapper
@@ -128,7 +128,7 @@ function! MempoolTree()
     let l:winnum = MempoolWinnr(l:bufname)
     if l:bufnr == -1 || l:winnum == -1
         topleft vertical new
-        execute 'file ' . fnameescape(l:bufname)
+        silent execute 'file ' . fnameescape(l:bufname)
     else
         execute l:winnum . 'wincmd w'
     endif
@@ -231,7 +231,7 @@ function! MempoolHelp()
         execute 'buffer ' . l:bufnr
     else
         enew
-        execute 'file ' . fnameescape(l:bufname)
+        silent execute 'file ' . fnameescape(l:bufname)
     endif
 
     setlocal buftype=nofile
