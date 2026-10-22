@@ -36,8 +36,14 @@ function! MempoolFetch(...)
         return
     endif
 
-    " Show API help when no endpoint is provided
+    " Show the navigatable API tree when no endpoint is provided
     if l:endpoint ==# ''
+        call MempoolTree()
+        return
+    endif
+
+    " Explicit help request
+    if l:endpoint ==# 'help'
         call MempoolHelp()
         return
     endif
@@ -133,7 +139,22 @@ function! MempoolTree()
 
     silent %delete _
     if exists('g:mempool_endpoints')
-        call setline(1, g:mempool_endpoints)
+        " Group endpoints by their first path segment for easier navigation
+        let l:grouped = []
+        let l:current = ''
+        for l:ep in sort(copy(g:mempool_endpoints))
+            let l:seg = split(l:ep, '/')[0]
+            if empty(l:seg)
+                let l:seg = split(l:ep, '/')[1]
+            endif
+            if l:seg !=# l:current
+                let l:current = l:seg
+                call add(l:grouped, '')
+                call add(l:grouped, '## ' . l:seg)
+            endif
+            call add(l:grouped, '  ' . l:ep)
+        endfor
+        call setline(1, l:grouped)
     endif
     setlocal nomodifiable
 
@@ -145,8 +166,8 @@ function! MempoolTree()
 endfunction
 
 function! MempoolTreeFetch()
-    let l:ep = getline('.')
-    if empty(l:ep)
+    let l:ep = trim(getline('.'))
+    if empty(l:ep) || l:ep !~# '^/'
         return
     endif
 
@@ -241,6 +262,7 @@ endfunction
 " Fetch custom endpoint (e.g., :Mempool /v1/fees/recommended)
 command! -nargs=? -complete=customlist,MempoolComplete Mempool :call MempoolFetch(<q-args>)
 command! MempoolTree :call MempoolTree()
+command! MempoolHelp :call MempoolHelp()
 
 " Fetch from an alternate data source (e.g., :MempoolAlt /v1/fees/recommended)
 command! -nargs=1 -complete=customlist,MempoolComplete MempoolAlt :call MempoolFetch(g:mempool_alt_api_url, <q-args>)
@@ -395,6 +417,10 @@ let g:mempool_endpoints = [
 \'/v1/validate-address/:address'
 \]
 " endpoints list defined above
+
+" Show completion as a vertical popup menu instead of a horizontal bar
+set wildmenu
+set wildoptions+=pum
 
 " API endpoint tab completion
 function! MempoolComplete(ArgLead, CmdLine, CursorPos)
