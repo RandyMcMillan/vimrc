@@ -36,6 +36,12 @@ function! MempoolFetch(...)
         return
     endif
 
+    " Show API help when no endpoint is provided
+    if l:endpoint ==# ''
+        call MempoolHelp()
+        return
+    endif
+
     " Construct full request endpoint
     let l:full_url = l:base_url . l:endpoint
     " Execute HTTP request without invoking a shell
@@ -107,12 +113,73 @@ function! MempoolFetchFrom(base_url, endpoint)
     call MempoolFetch(a:base_url, a:endpoint)
 endfunction
 
+" Display API help in a scratch buffer
+function! MempoolHelp()
+    " Prefer a file/view window over the NERDTree filetree
+    let l:target = 0
+    for w in range(1, winnr('$'))
+        if empty(getbufvar(winbufnr(w), 'NERDTree'))
+            let l:target = w
+            break
+        endif
+    endfor
+    if l:target != 0 && l:target != winnr()
+        execute l:target . 'wincmd w'
+    endif
+
+    let l:bufname = '[Mempool: help]'
+    let l:bufnr = bufnr(l:bufname)
+    if l:bufnr != -1
+        execute 'buffer ' . l:bufnr
+    else
+        enew
+        execute 'file ' . fnameescape(l:bufname)
+    endif
+
+    setlocal buftype=nofile
+    setlocal bufhidden=wipe
+    setlocal noswapfile
+    setlocal nobuflisted
+    setlocal modifiable
+
+    silent %delete _
+    let l:lines = [
+        \ 'Mempool.vim API help',
+        \ '',
+        \ 'Usage:',
+        \ '  :Mempool <endpoint>',
+        \ '  :MempoolAlt <endpoint>',
+        \ '  :MempoolGobSv <endpoint>',
+        \ '',
+        \ 'Common commands:',
+        \ '  :MempoolFees',
+        \ '  :MempoolHeight',
+        \ '  :MempoolBlocks',
+        \ '  :MempoolTx <txid>',
+        \ '  :MempoolAddress <address>',
+        \ '',
+        \ 'Sources:',
+        \ '  g:mempool_api_url        (default: https://mempool.space/api)',
+        \ '  g:mempool_alt_api_url    (default: https://bitcoin.gob.sv/api)',
+        \ '',
+        \ 'Available endpoints:',
+        \ ]
+    if exists('g:mempool_endpoints')
+        let l:lines += g:mempool_endpoints
+    endif
+    call setline(1, l:lines)
+
+    setlocal nomodifiable
+    setlocal filetype=text
+    echo 'Mempool API help'
+endfunction
+
 " ============================================================================
 " COMMANDS & QUICK WRAPPERS
 " ============================================================================
 
 " Fetch custom endpoint (e.g., :Mempool /v1/fees/recommended)
-command! -nargs=1 -complete=customlist,MempoolComplete Mempool :call MempoolFetch(<q-args>)
+command! -nargs=? -complete=customlist,MempoolComplete Mempool :call MempoolFetch(<q-args>)
 
 " Fetch from an alternate data source (e.g., :MempoolAlt /v1/fees/recommended)
 command! -nargs=1 -complete=customlist,MempoolComplete MempoolAlt :call MempoolFetch(g:mempool_alt_api_url, <q-args>)
