@@ -1,8 +1,11 @@
+#!/usr/bin/env python3
 import re
 import shutil
 import tempfile
 import urllib.request
 import zipfile
+import subprocess
+import sys
 from io import BytesIO
 from os import path
 
@@ -94,8 +97,12 @@ def update(plugin):
     except Exception as exp:
         print("Could not update {}. Error was: {}".format(name, str(exp)))
 
+def safe_install():
+    # 'sys.executable' maps automatically to the current active python3 binary
+    subprocess.run([sys.executable, "-m", "pip", "install", "vim-vint"], check=True)
 
 if __name__ == "__main__":
+    safe_install()
     temp_directory = tempfile.mkdtemp()
 
     try:
