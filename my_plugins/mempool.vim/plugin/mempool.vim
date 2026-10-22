@@ -23,7 +23,7 @@ function! MempoolFetch(endpoint)
     let l:response = system(l:cmd)
 
     if v:shell_error != 0
-        echoerr "Mempool API request failed: " . l:response
+        echoerr 'Mempool API request failed: ' . l:response
         return
     endif
 
@@ -59,7 +59,7 @@ function! MempoolFetch(endpoint)
     syntax enable
     setlocal filetype=json
 
-    echo "Fetched: " . l:full_url
+    echo 'Fetched: ' . l:full_url
 endfunction
 
 " Optional autoload-style wrapper
