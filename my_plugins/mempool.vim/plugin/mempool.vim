@@ -101,11 +101,22 @@ function! MempoolFetch(...)
     if empty(l:name)
         let l:name = 'index'
     endif
-    let l:height = get(g:, 'mempool_block_height', '')
-    if empty(l:height)
-        let l:height = 'latest'
+    " Ensure a block height is available
+    let l:height = str2nr(get(g:, 'mempool_block_height', ''))
+    if l:height <= 0
+        call MempoolFetchBackground('/blocks/tip/height')
+        let l:height = str2nr(get(g:, 'mempool_block_height', ''))
     endif
-    let l:dir = 'mempool' . '/' . l:height
+    if l:height <= 0
+        let l:height = 1
+    endif
+
+    " UTC time based subdirectories
+    let l:utc = localtime()
+    let l:weeble = l:utc / l:height
+    let l:wobble = l:utc % l:height
+
+    let l:dir = 'mempool' . '/' . l:height . '/' . l:weeble . '/' . l:wobble
     let l:bufname = l:dir . '/' . l:name . '.json'
     " Ensure the target directory exists so :w works
     call mkdir(l:dir, 'p')
@@ -502,6 +513,14 @@ augroup MempoolStartup
     autocmd!
     autocmd VimEnter * call MempoolFetchBackground('/blocks/tip/height')
 augroup END
+
+" MemPool command aliases for the NERDTree-derived filetree
+if exists(':NERDTreeToggle') == 2
+    command! -nargs=* -complete=dir MemPool MemPoolTree
+    command! -nargs=* -complete=dir MemPoolToggle NERDTreeToggle <args>
+    command! -nargs=* -complete=dir MemPoolClose NERDTreeClose <args>
+    command! -nargs=* -complete=dir MemPoolFind NERDTreeFind <args>
+endif
 
 " API endpoint tab completion
 function! MempoolComplete(ArgLead, CmdLine, CursorPos)
