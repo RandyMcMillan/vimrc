@@ -8,6 +8,12 @@ autocmd! bufwritepost my_configs.vim source %
 
 filetype plugin on
 
+let g:ale_linters = {
+\   'vim': ['vint'],
+\}
+" Show errors in the gutter column
+let g:ale_sign_column_always = 1
+
 if has("autocmd")
   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 endif
@@ -68,6 +74,20 @@ endif
 
 " make backspaces more powerfull
 set backspace=indent,eol,start
+
+set nomodeline
+
+"" Use code with caution.
+set modelineexpr
+
+set foldenable
+
+augroup VimScriptFolding
+  autocmd!
+  autocmd FileType vim setlocal expandtab shiftwidth=2 foldmethod=expr
+  " Using 'let' avoids the space parsing issue entirely
+  autocmd FileType vim let &l:foldexpr = "getline(v:lnum)=~'^\"\\ Section:'?'>1':getline(v:lnum)=~#'^fu'?'a1':getline(v:lnum)=~#'^endf'?'s1':'='"
+augroup END
 
 set ruler               " show line and column number
 syntax on               " syntax highlighting
