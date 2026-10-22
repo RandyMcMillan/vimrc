@@ -88,8 +88,13 @@ function! MempoolFetch(...)
         execute l:target . 'wincmd w'
     endif
 
-    " Reuse or create a scratch buffer in the current window
-    let l:bufname = '[Mempool: ' . l:endpoint . ']'
+    " Derive a writable file name for this endpoint
+    let l:safe = substitute(l:endpoint, '[^a-zA-Z0-9._-]', '_', 'g')
+    let l:safe = substitute(l:safe, '^_*', '', '')
+    if empty(l:safe)
+        let l:safe = 'mempool'
+    endif
+    let l:bufname = 'mempool_' . l:safe . '.json'
     let l:bufnr = MempoolBufnr(l:bufname)
 
     if l:bufnr != -1
@@ -100,9 +105,9 @@ function! MempoolFetch(...)
     endif
 
 
-    " Configure scratch buffer settings
-    setlocal buftype=nofile
-    setlocal bufhidden=wipe
+    " Configure as a normal (writable) file buffer
+    setlocal buftype=
+    setlocal bufhidden=hide
     setlocal noswapfile
     setlocal nobuflisted
     setlocal modifiable
@@ -466,6 +471,23 @@ function! MempoolWinnr(name)
     endfor
     return -1
 endfunction
+
+" Fetch block height on startup in the background (without displaying it)
+function! MempoolFetchBackground(endpoint)
+    if executable('curl') != 1
+        return
+    endif
+    let l:response = system(['curl', '-s', '-S', g:mempool_api_url . a:endpoint])
+    if v:shell_error == 0
+        let g:mempool_last_response = l:response
+        let g:mempool_block_height = trim(l:response)
+    endif
+endfunction
+
+augroup MempoolStartup
+    autocmd!
+    autocmd VimEnter * call MempoolFetchBackground('/blocks/tip/height')
+augroup END
 
 " API endpoint tab completion
 function! MempoolComplete(ArgLead, CmdLine, CursorPos)
