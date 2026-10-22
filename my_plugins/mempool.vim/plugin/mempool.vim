@@ -27,10 +27,10 @@ function! MempoolFetch(...)
     " Support an optional alternate base URL as the first argument
     if a:0 == 1
         let l:base_url = g:mempool_api_url
-        let l:endpoint = a:1
+        let l:endpoint = trim(a:1)
     elseif a:0 == 2
-        let l:base_url = a:1
-        let l:endpoint = a:2
+        let l:base_url = trim(a:1)
+        let l:endpoint = trim(a:2)
     else
         echoerr 'Mempool.vim Error: expected MempoolFetch(endpoint) or MempoolFetch(base_url, endpoint).'
         return
@@ -38,10 +38,8 @@ function! MempoolFetch(...)
 
     " Construct full request endpoint
     let l:full_url = l:base_url . l:endpoint
-    let l:cmd = 'curl -s -S ' . shellescape(l:full_url)
-
-    " Execute HTTP request
-    let l:response = system(l:cmd)
+    " Execute HTTP request without invoking a shell
+    let l:response = system(['curl', '-s', '-S', l:full_url])
 
     if v:shell_error != 0
         echoerr 'Mempool API request failed: ' . l:response
