@@ -102,12 +102,12 @@ endfunction
 " ============================================================================
 
 " Fetch custom endpoint (e.g., :Mempool /v1/fees/recommended)
-command! -nargs=1 Mempool :call MempoolFetch(<q-args>)
+command! -nargs=1 -complete=customlist,MempoolComplete Mempool :call MempoolFetch(<q-args>)
 
 " Fetch from an alternate data source (e.g., :MempoolAlt /v1/fees/recommended)
-command! -nargs=1 MempoolAlt :call MempoolFetch(g:mempool_alt_api_url, <q-args>)
-command! -nargs=1 MempoolGobSv :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, <q-args>)
-command! -nargs=1 MempoolBitcoinGobSv :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, <q-args>)
+command! -nargs=1 -complete=customlist,MempoolComplete MempoolAlt :call MempoolFetch(g:mempool_alt_api_url, <q-args>)
+command! -nargs=1 -complete=customlist,MempoolComplete MempoolGobSv :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, <q-args>)
+command! -nargs=1 -complete=customlist,MempoolComplete MempoolBitcoinGobSv :call MempoolFetch(g:mempool_bitcoin_gob_sv_url, <q-args>)
 
 " Helper wrappers for common endpoints
 command! MempoolFees   :call MempoolFetch('/v1/fees/recommended')
@@ -131,3 +131,139 @@ nnoremap <silent> <leader>mpf :MempoolFees<CR>
 nnoremap <silent> <leader>mph :MempoolHeight<CR>
 nnoremap <silent> <leader>mpb :MempoolBlocks<CR>
 nnoremap <silent> <leader>mpa :MempoolAltFees<CR>
+
+let g:mempool_endpoints = [
+\'/address/',
+\'/address/:address',
+\'/address/:address/txs',
+\'/address/:address/txs/chain',
+\'/address/:address/txs/mempool',
+\'/address/:address/utxo',
+\'/blocks',
+\'/blocks/',
+\'/blocks/tip/hash',
+\'/blocks/tip/height',
+\'/mempool',
+\'/mempool/mining-pools/blob/master/pools-v2',
+\'/mempool/recent',
+\'/mempool/txids',
+\'/tx',
+\'/tx/',
+\'/tx/:txId/rbf',
+\'/tx/:txid',
+\'/tx/:txid/hex',
+\'/tx/:txid/merkle-proof',
+\'/tx/:txid/merkleblock-proof',
+\'/tx/:txid/outspend/:vout',
+\'/tx/:txid/outspends',
+\'/tx/:txid/raw',
+\'/tx/:txid/status',
+\'/txid/',
+\'/txids',
+\'/txs',
+\'/txs/chain',
+\'/txs/mempool',
+\'/v1/asset/',
+\'/v1/asset/:asset_id/icon',
+\'/v1/assets/icons',
+\'/v1/block/',
+\'/v1/block/:blockHash/audit-summary',
+\'/v1/block/:hash',
+\'/v1/blocks',
+\'/v1/blocks-bulk/',
+\'/v1/blocks-bulk/:minHeight',
+\'/v1/blocks/',
+\'/v1/cpfp',
+\'/v1/cpfp/',
+\'/v1/difficulty-adjustment',
+\'/v1/fees/mempool-blocks',
+\'/v1/fees/precise',
+\'/v1/fees/recommended',
+\'/v1/fullrbf/replacements',
+\'/v1/historical-price',
+\'/v1/lightning/channels',
+\'/v1/lightning/channels-geo',
+\'/v1/lightning/channels-geo/',
+\'/v1/lightning/channels-geo/:pubKey',
+\'/v1/lightning/channels/',
+\'/v1/lightning/channels/:channelId',
+\'/v1/lightning/channels/txids',
+\'/v1/lightning/nodes/',
+\'/v1/lightning/nodes/:pubKey',
+\'/v1/lightning/nodes/:pubKey/statistics',
+\'/v1/lightning/nodes/countries',
+\'/v1/lightning/nodes/country/',
+\'/v1/lightning/nodes/country/:country',
+\'/v1/lightning/nodes/isp-ranking',
+\'/v1/lightning/nodes/isp/',
+\'/v1/lightning/nodes/isp/:isp',
+\'/v1/lightning/nodes/rankings',
+\'/v1/lightning/nodes/rankings/age',
+\'/v1/lightning/nodes/rankings/connectivity',
+\'/v1/lightning/nodes/rankings/liquidity',
+\'/v1/lightning/search',
+\'/v1/lightning/statistics/',
+\'/v1/lightning/statistics/:interval',
+\'/v1/mining/blocks/audit/score/',
+\'/v1/mining/blocks/audit/score/:blockHash',
+\'/v1/mining/blocks/audit/scores/',
+\'/v1/mining/blocks/audit/scores/:startHeight',
+\'/v1/mining/blocks/fee-rates/',
+\'/v1/mining/blocks/fee-rates/:timePeriod',
+\'/v1/mining/blocks/fee-rates/:timePeriod/precise',
+\'/v1/mining/blocks/fees/',
+\'/v1/mining/blocks/fees/:timePeriod',
+\'/v1/mining/blocks/predictions/',
+\'/v1/mining/blocks/predictions/:timePeriod',
+\'/v1/mining/blocks/rewards/',
+\'/v1/mining/blocks/rewards/:timePeriod',
+\'/v1/mining/blocks/sizes-weights/',
+\'/v1/mining/blocks/sizes-weights/:timePeriod',
+\'/v1/mining/blocks/timestamp/',
+\'/v1/mining/blocks/timestamp/:timestamp',
+\'/v1/mining/difficulty-adjustments/',
+\'/v1/mining/difficulty-adjustments/1m',
+\'/v1/mining/hashrate/',
+\'/v1/mining/hashrate/3d',
+\'/v1/mining/hashrate/pools/',
+\'/v1/mining/pool/',
+\'/v1/mining/pool/:slug',
+\'/v1/mining/pool/:slug/blocks/',
+\'/v1/mining/pool/:slug/hashrate',
+\'/v1/mining/pools',
+\'/v1/mining/pools/',
+\'/v1/mining/reward-stats/',
+\'/v1/mining/reward-stats/:blockCount',
+\'/v1/prices',
+\'/v1/replacements',
+\'/v1/services/accelerator/accelerate',
+\'/v1/services/accelerator/accelerations',
+\'/v1/services/accelerator/accelerations/history',
+\'/v1/services/accelerator/accelerations/stats',
+\'/v1/services/accelerator/auto-accelerate',
+\'/v1/services/accelerator/auto-accelerate/cancel',
+\'/v1/services/accelerator/auto-accelerate/history',
+\'/v1/services/accelerator/balance',
+\'/v1/services/accelerator/cancel',
+\'/v1/services/accelerator/estimate',
+\'/v1/services/accelerator/history',
+\'/v1/services/accelerator/invoice',
+\'/v1/services/accelerator/top-up',
+\'/v1/services/accelerator/top-up-history',
+\'/v1/transaction-times',
+\'/v1/tx/',
+\'/v1/validate-address/',
+\'/v1/validate-address/:address'
+\]
+" endpoints list defined above
+
+" API endpoint tab completion
+function! MempoolComplete(ArgLead, CmdLine, CursorPos)
+    if !exists('g:mempool_endpoints')
+        return []
+    endif
+    if a:ArgLead ==# ''
+        return copy(g:mempool_endpoints)
+    endif
+    return filter(copy(g:mempool_endpoints), 'stridx(v:val, a:ArgLead) ==# 0')
+endfunction
