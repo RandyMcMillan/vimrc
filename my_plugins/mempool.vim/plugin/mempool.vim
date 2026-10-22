@@ -48,15 +48,33 @@ function! MempoolFetch(...)
         return
     endif
 
-    " Construct full request endpoint
-    let l:full_url = l:base_url . l:endpoint
-    " Execute HTTP request without invoking a shell
-    let l:response = system(['curl', '-s', '-S', l:full_url])
+    " Fetch, prompting for any missing parameters reported by the API
+    let l:retry = 1
+    while l:retry
+        let l:full_url = l:base_url . l:endpoint
+        let l:response = system(['curl', '-s', '-S', l:full_url])
 
-    if v:shell_error != 0
-        echoerr 'Mempool API request failed: ' . l:response
-        return
-    endif
+        if v:shell_error != 0
+            echoerr 'Mempool API request failed: ' . l:response
+            return
+        endif
+
+        let l:missing = matchstr(l:response, 'Missing parameter: \zs\w\+')
+        if empty(l:missing)
+            let l:retry = 0
+        else
+            let l:value = input('Enter ' . l:missing . ': ')
+            if empty(l:value)
+                let l:retry = 0
+            else
+                if l:endpoint =~# '?'
+                    let l:endpoint .= '&' . l:missing . '=' . l:value
+                else
+                    let l:endpoint .= '?' . l:missing . '=' . l:value
+                endif
+            endif
+        endif
+    endwhile
 
     " Prefer a file/view window over the NERDTree filetree
     let l:target = 0
