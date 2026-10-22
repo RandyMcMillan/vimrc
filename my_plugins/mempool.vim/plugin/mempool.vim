@@ -72,7 +72,7 @@ function! MempoolFetch(...)
 
     " Reuse or create a scratch buffer in the current window
     let l:bufname = '[Mempool: ' . l:endpoint . ']'
-    let l:bufnr = bufnr(l:bufname)
+    let l:bufnr = MempoolBufnr(l:bufname)
 
     if l:bufnr != -1
         execute 'buffer ' . l:bufnr
@@ -80,6 +80,7 @@ function! MempoolFetch(...)
         enew
         execute 'file ' . fnameescape(l:bufname)
     endif
+
 
     " Configure scratch buffer settings
     setlocal buftype=nofile
@@ -123,12 +124,13 @@ endfunction
 function! MempoolTree()
     " Open or reuse the tree window on the left
     let l:bufname = '[MempoolTree]'
-    let l:bufnr = bufnr(l:bufname)
-    if l:bufnr == -1 || bufwinnr(l:bufnr) == -1
+    let l:bufnr = MempoolBufnr(l:bufname)
+    let l:winnum = MempoolWinnr(l:bufname)
+    if l:bufnr == -1 || l:winnum == -1
         topleft vertical new
         execute 'file ' . fnameescape(l:bufname)
     else
-        execute bufwinnr(l:bufnr) . 'wincmd w'
+        execute l:winnum . 'wincmd w'
     endif
 
     setlocal buftype=nofile
@@ -203,6 +205,9 @@ function! MempoolTreeFetch()
     endif
 
     execute l:target . 'wincmd w'
+    redir! > /tmp/mtf_debug.txt
+    silent echo 'target=' . l:target . ' winnr=' . winnr() . ' buf=' . bufname('%')
+    redir END
     call MempoolFetch(l:ep)
 endfunction
 
@@ -221,7 +226,7 @@ function! MempoolHelp()
     endif
 
     let l:bufname = '[Mempool: help]'
-    let l:bufnr = bufnr(l:bufname)
+    let l:bufnr = MempoolBufnr(l:bufname)
     if l:bufnr != -1
         execute 'buffer ' . l:bufnr
     else
@@ -424,6 +429,25 @@ let g:mempool_endpoints = [
 " Show completion as a vertical popup menu instead of a horizontal bar
 set wildmenu
 set wildoptions+=pum
+
+" Exact buffer/window lookup helpers (avoid bufnr/bufwinnr pattern matching)
+function! MempoolBufnr(name)
+    for b in range(1, bufnr('$'))
+        if bufname(b) ==# a:name
+            return b
+        endif
+    endfor
+    return -1
+endfunction
+
+function! MempoolWinnr(name)
+    for w in range(1, winnr('$'))
+        if bufname(winbufnr(w)) ==# a:name
+            return w
+        endif
+    endfor
+    return -1
+endfunction
 
 " API endpoint tab completion
 function! MempoolComplete(ArgLead, CmdLine, CursorPos)
