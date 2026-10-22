@@ -46,14 +46,26 @@ function! MempoolFetch(...)
         return
     endif
 
-    " Open or reuse a scratch buffer for output
-    let l:bufname = '[Mempool: ' . l:endpoint . ']'
-    let l:winnum = bufwinnr(l:bufname)
+    " Prefer a file/view window over the NERDTree filetree
+    let l:target = 0
+    for w in range(1, winnr('$'))
+        if empty(getbufvar(winbufnr(w), 'NERDTree'))
+            let l:target = w
+            break
+        endif
+    endfor
+    if l:target != 0 && l:target != winnr()
+        execute l:target . 'wincmd w'
+    endif
 
-    if l:winnum != -1
-        execute l:winnum . 'wincmd w'
+    " Reuse or create a scratch buffer in the current window
+    let l:bufname = '[Mempool: ' . l:endpoint . ']'
+    let l:bufnr = bufnr(l:bufname)
+
+    if l:bufnr != -1
+        execute 'buffer ' . l:bufnr
     else
-        vertical new
+        enew
         execute 'file ' . fnameescape(l:bufname)
     endif
 
