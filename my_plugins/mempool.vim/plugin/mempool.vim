@@ -113,6 +113,66 @@ function! MempoolFetchFrom(base_url, endpoint)
     call MempoolFetch(a:base_url, a:endpoint)
 endfunction
 
+" Open a navigatable API endpoint browser in a side window
+function! MempoolTree()
+    " Open or reuse the tree window on the left
+    let l:bufname = '[MempoolTree]'
+    let l:bufnr = bufnr(l:bufname)
+    if l:bufnr == -1 || bufwinnr(l:bufnr) == -1
+        topleft vertical new
+        execute 'file ' . fnameescape(l:bufname)
+    else
+        execute bufwinnr(l:bufnr) . 'wincmd w'
+    endif
+
+    setlocal buftype=nofile
+    setlocal bufhidden=wipe
+    setlocal noswapfile
+    setlocal nobuflisted
+    setlocal modifiable
+
+    silent %delete _
+    if exists('g:mempool_endpoints')
+        call setline(1, g:mempool_endpoints)
+    endif
+    setlocal nomodifiable
+
+    nnoremap <buffer> <CR> :call MempoolTreeFetch()<CR>
+    nnoremap <buffer> o :call MempoolTreeFetch()<CR>
+    nnoremap <buffer> q :close<CR>
+
+    echo 'Mempool API tree'
+endfunction
+
+function! MempoolTreeFetch()
+    let l:ep = getline('.')
+    if empty(l:ep)
+        return
+    endif
+
+    " Find a file/view window (not the tree or NERDTree)
+    let l:target = 0
+    for w in range(1, winnr('$'))
+        let l:bn = bufname(winbufnr(w))
+        if l:bn !~# 'MempoolTree' && empty(getbufvar(winbufnr(w), 'NERDTree'))
+            let l:target = w
+            break
+        endif
+    endfor
+
+    if l:target == 0
+        " Create a window to the right for output
+        wincmd l
+        if winnr() == 1
+            vertical new
+        endif
+        let l:target = winnr()
+    endif
+
+    execute l:target . 'wincmd w'
+    call MempoolFetch(l:ep)
+endfunction
+
 " Display API help in a scratch buffer
 function! MempoolHelp()
     " Prefer a file/view window over the NERDTree filetree
@@ -180,6 +240,7 @@ endfunction
 
 " Fetch custom endpoint (e.g., :Mempool /v1/fees/recommended)
 command! -nargs=? -complete=customlist,MempoolComplete Mempool :call MempoolFetch(<q-args>)
+command! MempoolTree :call MempoolTree()
 
 " Fetch from an alternate data source (e.g., :MempoolAlt /v1/fees/recommended)
 command! -nargs=1 -complete=customlist,MempoolComplete MempoolAlt :call MempoolFetch(g:mempool_alt_api_url, <q-args>)
@@ -208,6 +269,7 @@ nnoremap <silent> <leader>mpf :MempoolFees<CR>
 nnoremap <silent> <leader>mph :MempoolHeight<CR>
 nnoremap <silent> <leader>mpb :MempoolBlocks<CR>
 nnoremap <silent> <leader>mpa :MempoolAltFees<CR>
+nnoremap <silent> <leader>mpt :MempoolTree<CR>
 
 let g:mempool_endpoints = [
 \'/address/',
