@@ -201,16 +201,16 @@ set exrc
 "" Make tabs as wide as two spaces
 "set tabstop=4
 "" Show “invisible” characters
-"set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
-"set list
+set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
+set list
 "" Highlight searches
-"set hlsearch
+set hlsearch
 "" Ignore case of searches
-"set ignorecase
+set ignorecase
 "" Highlight dynamically as pattern is typed
-"set incsearch
+set incsearch
 "" Always show status line
-"set laststatus=2
+set laststatus=2
 "" Enable mouse in all modes
 "set mouse=a
 "" Disable error bells
@@ -218,38 +218,38 @@ set exrc
 "" Don’t reset cursor to start of line when moving around.
 "set nostartofline
 "" Show the cursor position
-"set ruler
+set ruler
 "" Don’t nnoremapshow the intro message when starting Vim
 "set shortmess=atI
 "" Show the current mode
-"set showmode
+set showmode
 "" Show the filename in the window titlebar
-"set title
-"auto BufEnter * let &titlestring = hostname() . "/" . expand("%:p")
+set title
+auto BufEnter * let &titlestring = hostname() . "/" . expand("%:p")
 "
 "" add useful stuff to title bar (file name, flags, cwd)
 "" based on @factorylabs
-"if has('title') && (has('gui_running') || &title)
-""  set titlestring=
-"    set titlestring+=%f
-"    set titlestring+=%h%m%r%w
-"    set titlestring+=\ -\ %{v:progname}
-"    set titlestring+=\ -\ %{substitute(getcwd(),\ $HOME,\ '~',\ '')}
-"endif
+if has('title') && (has('gui_running') || &title)
+"  set titlestring=
+    set titlestring+=%f
+    set titlestring+=%h%m%r%w
+    set titlestring+=\ -\ %{v:progname}
+    set titlestring+=\ -\ %{substitute(getcwd(),\ $HOME,\ '~',\ '')}
+endif
 "
 "
 "" Show the (partial) command as it’s being typed
-"set showcmd
+set showcmd
 "" Enable line numbers
-"set number
+set number
 "" Use hybrid line numbers
-" if exists("&relativenumber")
-"		set number relativenumber
-"		au BufReadPost * set relativenumber
-" endif
+if exists("&relativenumber")
+   	set number relativenumber
+   	au BufReadPost * set relativenumber
+endif
 "
 "" Start scrolling three lines before the horizontal window border
-"set scrolloff=3
+set scrolloff=3
 "
 """ Strip trailing whitespace (,ss)
 ""function! StripWhitespace()
