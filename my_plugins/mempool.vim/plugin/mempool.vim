@@ -61,7 +61,7 @@ function! MempoolFetch(...)
     " Prefer a file/view window over the NERDTree filetree
     let l:target = 0
     for w in range(1, winnr('$'))
-        if empty(getbufvar(winbufnr(w), 'NERDTree'))
+        if empty(getbufvar(winbufnr(w), 'NERDTree')) && bufname(winbufnr(w)) !~# 'MempoolTree'
             let l:target = w
             break
         endif
@@ -171,6 +171,18 @@ function! MempoolTreeFetch()
         return
     endif
 
+    " Prompt for any placeholder parameters (e.g. :address, :txid)
+    let l:matches = []
+    call substitute(l:ep, ':\\([a-zA-Z_][a-zA-Z0-9_]*\\)', '\\=add(l:matches, submatch(1))', 'g')
+    for l:param in l:matches
+        let l:value = input('Enter ' . l:param . ': ')
+        if empty(l:value)
+            echo 'Cancelled.'
+            return
+        endif
+        let l:ep = substitute(l:ep, ':' . l:param, l:value, 'g')
+    endfor
+
     " Find a file/view window (not the tree or NERDTree)
     let l:target = 0
     for w in range(1, winnr('$'))
@@ -199,7 +211,7 @@ function! MempoolHelp()
     " Prefer a file/view window over the NERDTree filetree
     let l:target = 0
     for w in range(1, winnr('$'))
-        if empty(getbufvar(winbufnr(w), 'NERDTree'))
+        if empty(getbufvar(winbufnr(w), 'NERDTree')) && bufname(winbufnr(w)) !~# 'MempoolTree'
             let l:target = w
             break
         endif
