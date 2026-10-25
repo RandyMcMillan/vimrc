@@ -8,6 +8,6 @@ export GIT
 	@echo $$GIT
 	$(shell which python3) ./update_plugins.py
 	. install_awesome_vimrc.sh
-	$$GIT add sources_non_forked
+	$$GIT add sources_non_forked .
 	$$GNOSTR legit -m sources_non_forked
 	$$GIT push origin
