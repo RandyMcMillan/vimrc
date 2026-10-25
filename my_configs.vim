@@ -229,7 +229,8 @@ else
     "echo "!gui_running"
 endif
 
-set colorcolumn=40,50,79,81,129,131,159,161,209,211
+set colorcolumn=3,5,40,50,79,81,129,131,159,161,209,211
+
 if has("gui_running")
   set background=dark
   "check your terminal settings
