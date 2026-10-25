@@ -114,26 +114,83 @@ endif "end if autocmd
 "" green     #859900  2/2 green     64 #5f8700 60 -20  65 133 153   0  68 100  60
 
 if has("autocmd")
-  autocmd ColorScheme * highlight ColorColumn ctermbg=235 ctermfg=NONE "guibg=#d7d7af guifg=#d7d7af
+  autocmd ColorScheme * highlight ColorColumn ctermbg=235 ctermfg=NONE 
   autocmd ColorScheme * highlight Normal      ctermbg=NONE guibg=NONE
-  autocmd ColorScheme * highlight LineNr      ctermbg=234 ctermfg=245
+  "autocmd ColorScheme * highlight LineNr      ctermbg=234 ctermfg=245
 endif
    autocmd ColorScheme * highlight CursorLine    ctermbg=red guibg=grey ctermfg=grey guifg=grey
    autocmd ColorScheme * highlight CursorColumn  ctermbg=red guibg=grey
  
    autocmd ColorScheme * highlight LightlineLeft_tabline_0  ctermfg=252 ctermbg=242 guifg=#d0d0d0 guibg=#666666
-   "autocmd ColorScheme * highlight LightlineLeft_tabline_0_1  ctermfg=242 ctermbg=238 guifg=#666666 guibg=#444444
-   "autocmd ColorScheme * highlight LightlineLeft_tabline_0_tabsel  ctermfg=242 ctermbg=235 guifg=#666666 guibg=#242424
-   "autocmd ColorScheme * highlight LightlineLeft_tabline_tabsel  ctermfg=252 ctermbg=235 guifg=#d0d0d0 guibg=#242424
-   "autocmd ColorScheme * highlight LightlineLeft_tabline_tabsel_0  ctermfg=235 ctermbg=242 guifg=#242424 guibg=#666666
-   "autocmd ColorScheme * highlight LightlineLeft_tabline_tabsel_1  ctermfg=235 ctermbg=238 guifg=#242424 guibg=#444444
-   "autocmd ColorScheme * highlight LightlineLeft_tabline_tabsel_tabsel  ctermfg=235 ctermbg=235 guifg=#242424 guibg=#242424
-   "autocmd ColorScheme * highlight LightlineRight_tabline_0  ctermfg=248 ctermbg=242 guifg=#a8a8a8 guibg=#666666
-   "autocmd ColorScheme * highlight LightlineRight_tabline_0_1  ctermfg=242 ctermbg=238 guifg=#666666 guibg=#444444
-   "autocmd ColorScheme * highlight LightlineRight_tabline_0_tabsel  ctermfg=242 ctermbg=235 guifg=#666666 guibg=#242424
-   "autocmd ColorScheme * highlight LightlineRight_tabline_tabsel  ctermfg=252 ctermbg=235 guifg=#d0d0d0 guibg=#242424
-   "autocmd ColorScheme * highlight LightlineRight_tabline_tabsel_0  ctermfg=235 ctermbg=242 guifg=#242424 guibg=#666666
+   autocmd ColorScheme * highlight LightlineLeft_tabline_0_1  ctermfg=242 ctermbg=238 guifg=#666666 guibg=#444444
+   autocmd ColorScheme * highlight LightlineLeft_tabline_0_tabsel  ctermfg=242 ctermbg=235 guifg=#666666 guibg=#242424
+   autocmd ColorScheme * highlight LightlineLeft_tabline_tabsel  ctermfg=252 ctermbg=235 guifg=#d0d0d0 guibg=#242424
+   autocmd ColorScheme * highlight LightlineLeft_tabline_tabsel_0  ctermfg=235 ctermbg=242 guifg=#242424 guibg=#666666
+   autocmd ColorScheme * highlight LightlineLeft_tabline_tabsel_1  ctermfg=235 ctermbg=238 guifg=#242424 guibg=#444444
+   autocmd ColorScheme * highlight LightlineLeft_tabline_tabsel_tabsel  ctermfg=235 ctermbg=235 guifg=#242424 guibg=#242424
+   autocmd ColorScheme * highlight LightlineRight_tabline_0  ctermfg=248 ctermbg=242 guifg=#a8a8a8 guibg=#666666
+   autocmd ColorScheme * highlight LightlineRight_tabline_0_1  ctermfg=242 ctermbg=238 guifg=#666666 guibg=#444444
+   autocmd ColorScheme * highlight LightlineRight_tabline_0_tabsel  ctermfg=242 ctermbg=235 guifg=#666666 guibg=#242424
+   autocmd ColorScheme * highlight LightlineRight_tabline_tabsel  ctermfg=252 ctermbg=235 guifg=#d0d0d0 guibg=#242424
+   autocmd ColorScheme * highlight LightlineRight_tabline_tabsel_0  ctermfg=235 ctermbg=242 guifg=#242424 guibg=#666666
 
+
+
+" =============================================================================
+" Comprehensive Solarized Dark UI Theme Configuration
+" =============================================================================
+augroup SolarizedCompleteUI
+    autocmd!
+
+    " --- 1. Line Numbers & Gutters ---
+    " LineNr: base03 background (#002b36, 234), base01 foreground (#586e75, 240)[cite: 3]
+    autocmd ColorScheme * highlight LineNr ctermbg=234 ctermfg=240 guibg=#002b36 guifg=#586e75
+    
+    " CursorLineNr: base02 background (#073642, 235), base1 foreground (#93a1a1, 245)[cite: 3]
+    autocmd ColorScheme * highlight CursorLineNr ctermbg=235 ctermfg=245 guibg=#073642 guifg=#93a1a1 cterm=bold gui=bold
+    
+    " SignColumn & FoldColumn: Seamless background matching base03 (#002b36, 234)[cite: 3]
+    autocmd ColorScheme * highlight SignColumn ctermbg=234 ctermfg=244 guibg=#002b36 guifg=#839496
+    autocmd ColorScheme * highlight FoldColumn ctermbg=234 ctermfg=244 guibg=#002b36 guifg=#839496
+
+    " --- 2. Cursors & Lines ---
+    " CursorLine: base02 background (#073642, 235)[cite: 3]
+    autocmd ColorScheme * highlight CursorLine ctermbg=235 guibg=#073642 cterm=none gui=none
+    
+    " CursorColumn: base02 background (#073642, 235)[cite: 3]
+    autocmd ColorScheme * highlight CursorColumn ctermbg=235 guibg=#073642
+    
+    " ColorColumn (e.g., text width guides): base02 background (#073642, 235)[cite: 3]
+    autocmd ColorScheme * highlight ColorColumn ctermbg=235 guibg=#073642
+
+    " --- 3. Selection & Search ---
+    " Visual Selection: base02 background (#073642, 235) with highlighted contrast
+    autocmd ColorScheme * highlight Visual ctermbg=235 ctermfg=254 guibg=#073642 guifg=#eee8d5
+    
+    " Search Highlighting: yellow background (#b58900, 136)[cite: 3], base03 text (#002b36, 234)[cite: 3]
+    autocmd ColorScheme * highlight Search ctermbg=136 ctermfg=234 guibg=#b58900 guifg=#002b36 cterm=none gui=none
+    autocmd ColorScheme * highlight IncSearch ctermbg=166 ctermfg=234 guibg=#cb4b16 guifg=#002b36 cterm=none gui=none
+
+    " --- 4. Main Text & Background ---
+    " Normal text: base0 foreground (#839496, 244) on base03 background (#002b36, 234)[cite: 3]
+    autocmd ColorScheme * highlight Normal ctermbg=234 ctermfg=244 guibg=#002b36 guifg=#839496
+
+    " --- 5. Statusline / Tabline Elements ---
+    " StatusLine: base02 background (#073642, 235), base1 text (#93a1a1, 245)[cite: 3]
+    autocmd ColorScheme * highlight StatusLine ctermbg=235 ctermfg=245 guibg=#073642 guifg=#93a1a1 cterm=none gui=none
+    
+    " StatusLineNC (Inactive): base02 background (#073642, 235), base01 text (#586e75, 240)[cite: 3]
+    autocmd ColorScheme * highlight StatusLineNC ctermbg=235 ctermfg=240 guibg=#073642 guifg=#586e75 cterm=none gui=none
+
+    " --- 6. Syntax / Code Elements ---
+    autocmd ColorScheme * highlight Comment ctermfg=240 guifg=#586e75 cterm=italic gui=italic
+    autocmd ColorScheme * highlight Constant ctermfg=37 guifg=#2aa198        " Cyan[cite: 3]
+    autocmd ColorScheme * highlight Identifier ctermfg=33 guifg=#268bd2       " Blue[cite: 3]
+    autocmd ColorScheme * highlight Statement ctermfg=64 guifg=#859900        " Green[cite: 3]
+    autocmd ColorScheme * highlight PreProc ctermfg=166 guifg=#cb4b16         " Orange[cite: 3]
+    autocmd ColorScheme * highlight Type ctermfg=136 guifg=#b58900            " Yellow[cite: 3]
+    autocmd ColorScheme * highlight Special ctermfg=125 guifg=#d33682         " Magenta[cite: 3]
+augroup END
 
 if has("gui_running")
     "echo "gui_running"
@@ -508,31 +565,16 @@ execute 'nnoremap <silent> <leader>' . mapleader_fold_toggle . ' za'
 "autocmd BufRead */.git/COMMIT_EDITMSG call s:expand_commit_template()
 let mapleader = "\\"
 
-""  -----------------------------------------------------------------------------
-""" AUTOSTART SOLARIZED COLORSCHEME
-""" -----------------------------------------------------------------------------
-""augroup StartupSolarizedToggle
-""    autocmd!
-""    " Run the function after Vim has fully started and the UI is initialized
-""    autocmd VimEnter * call ToggleSolarizedColors()
-""augroup END
-"" Call the function directly on load
+"  -----------------------------------------------------------------------------
+"" AUTOSTART SOLARIZED COLORSCHEME
+"" -----------------------------------------------------------------------------
+"augroup StartupSolarizedToggle
+"    autocmd!
+"    " Run the function after Vim has fully started and the UI is initialized
+"    autocmd VimEnter * call ToggleSolarizedColors()
+"augroup END
+" Call the function directly on load
 "call ToggleSolarizedColors()
-
-""  -----------------------------------------------------------------------------
-""" AUTOSTART NERDTREE
-""" -----------------------------------------------------------------------------
-""augroup NERDTreeAutostart
-""    autocmd!
-""    " Automatically open NERDTree when Vim starts up
-""    autocmd VimEnter * NERDTree
-""
-""    " Automatically move the cursor back to the main editing window
-""    autocmd VimEnter * wincmd p
-""
-""    " Automatically close Vim if NERDTree is the only window left open
-""    autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-""augroup END
 
 " -----------------------------------------------------------------------------
 " AUTOSTART NERDTREE AND FOCUS TREE WHEN NO FILE IS GIVEN
