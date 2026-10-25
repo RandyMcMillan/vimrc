@@ -15,5 +15,5 @@ export GIT
 	. install_awesome_vimrc.sh
 	$$GIT add sources_non_forked
 	$$GIT push --set-upstream origin $$BRANCH
-	$$GNOSTR legit -m sources_non_forked
-	$$GIT push origin $$BRANCH $$BRANCH
+	#$$GNOSTR legit -m sources_non_forked
+	#$$GIT push origin $$BRANCH $$BRANCH
