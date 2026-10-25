@@ -129,10 +129,21 @@ endif "end if autocmd
 "" green     #859900  2/2 green     64 #5f8700 60 -20  65 133 153   0  68 100  60
 
 if has("autocmd")
-  autocmd ColorScheme * highlight ColorColumn ctermbg=235 ctermfg=NONE 
-  autocmd ColorScheme * highlight Normal      ctermbg=NONE guibg=NONE
-  "autocmd ColorScheme * highlight LineNr      ctermbg=234 ctermfg=245
+     autocmd ColorScheme * highlight ColorColumn ctermbg=235 ctermfg=NONE
+     autocmd ColorScheme * highlight Normal      ctermbg=NONE guibg=NONE
+     "autocmd ColorScheme * highlight LineNr      ctermbg=234 ctermfg=245
 endif
+
+if has("autocmd")
+   " not folding
+    " folding
+     " folding
+    " folding
+     " folding
+    " folding
+   " not folding
+endif
+
    autocmd ColorScheme * highlight CursorLine    ctermbg=red guibg=grey ctermfg=grey guifg=grey
    autocmd ColorScheme * highlight CursorColumn  ctermbg=red guibg=grey
  
@@ -636,7 +647,7 @@ function! CheckTerminalSize()
     endif
 endfunction
 
-nnoremap <leader>t :call CheckTerminalSize()<CR>
+nnoremap <leader>T :call CheckTerminalSize()<CR>
 
 nmap <leader>t :call ToggleSolarizedColors()<CR>
 nmap <leader>l :set list!<CR>
