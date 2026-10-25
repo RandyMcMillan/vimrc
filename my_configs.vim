@@ -35,12 +35,12 @@ let g:ale_sign_column_always = 1
 augroup MyConfigsAutoInstall
     autocmd!
     " Triggered whenever any file ending in my_configs.vim is saved
-    autocmd BufWritePost *my_configs.vim silent !cp % ~/.vimrc
+    "autocmd BufWritePost *my_configs.vim silent !cp % ~/.vimrc
     " Display a confirmation message in the command-line area after saving
-    autocmd BufWritePost *my_configs.vim redraw! | echomsg "Installed " . expand('%:p') . " -> ~/.vimrc"
+    "autocmd BufWritePost *my_configs.vim redraw! | echomsg "Installed " . expand('%:p') . " -> ~/.vimrc"
     "auto load a vimrc .vimrc my_configs.vim after edit
-    autocmd! bufwritepost  vimrc source %
-    autocmd! bufwritepost .vimrc source %
+    "autocmd! bufwritepost  vimrc source %
+    "autocmd! bufwritepost .vimrc source %
     autocmd! bufwritepost my_configs.vim source %
 augroup END
 
