@@ -207,6 +207,22 @@ augroup SolarizedCompleteUI
     autocmd ColorScheme * highlight Special ctermfg=125 guifg=#d33682         " Magenta[cite: 3]
 augroup END
 
+" --- 7. Light / Dark Background Toggle Function ---
+function! ToggleSolarizedBackground()
+    if &background ==# 'dark'
+        set background=light
+        echo "Solarized: Light Mode Enabled"
+
+    else
+        set background=dark
+        echo "Solarized: Dark Mode Enabled"
+
+    endif
+endfunction
+
+" Map <leader>t to toggle light/dark modes instantly
+"nnoremap <silent> <leader>t :call ToggleSolarizedBackground()<CR>
+
 if has("gui_running")
     "echo "gui_running"
 else
