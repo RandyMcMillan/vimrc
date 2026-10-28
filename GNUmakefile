@@ -13,7 +13,7 @@ export GIT
 	@echo $$BRANCH
 	$(shell which python3) ./update_plugins.py
 	. install_awesome_vimrc.sh
-	$$GIT add sources_non_forked
+	GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 $$GIT add sources_non_forked
 	$$GIT push --set-upstream origin $$BRANCH
 	#$$GNOSTR legit -m sources_non_forked
 	#$$GIT push origin $$BRANCH $$BRANCH
