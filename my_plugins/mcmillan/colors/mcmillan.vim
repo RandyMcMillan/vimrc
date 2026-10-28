@@ -1,6 +1,6 @@
-" Vim color file --- Solarized (Adapted from Peaksea structure)
+" Vim color file --- Optimized Solarized (Adapted from Peaksea structure)
 " Maintainer: Randy McMillan / Adapted for Solarized workflow
-" Description: Clean, native-style Solarized color scheme supporting GUI and 256-color terminals.
+" Description: Clean, high-performance native-style Solarized color scheme supporting GUI and 256-color terminals.
 
 hi clear
 
@@ -8,278 +8,220 @@ if exists("syntax_on")
   syntax reset
 endif
 
-let g:colors_name = "solarized"
+let g:colors_name = "mcmillan"
+":source % | colorscheme mcmillan
+" Quick reload and re-apply mcmillan color scheme
+nnoremap <leader>q :w<CR>:source %<CR>:colorscheme mcmillan<CR>:echo "mcmillan.vim reloaded!"<CR>
+" Toggle background mode between light and dark
+nnoremap <leader>bg :let &background = (&background == 'dark' ? 'light' : 'dark')<CR>:colorscheme mcmillan<CR>:echo "Background set to " . &background<CR>
 
-if &background=='light' 
+" Helper function to set GUI and Cterm attributes simultaneously with zero redundancy
+function! s:h(group, fg, bg, attr)
+  let l:cmd = "hi " . a:group
+
+  " Foreground checks
+  if !empty(a:fg) && !empty(a:fg[0])
+    let l:cmd .= " guifg=" . a:fg[0]
+  endif
+  if !empty(a:fg) && len(a:fg) > 1 && !empty(a:fg[1])
+    let l:cmd .= " ctermfg=" . a:fg[1]
+  endif
+
+  " Background checks
+  if !empty(a:bg) && !empty(a:bg[0])
+    let l:cmd .= " guibg=" . a:bg[0]
+  endif
+  if !empty(a:bg) && len(a:bg) > 1 && !empty(a:bg[1])
+    let l:cmd .= " ctermbg=" . a:bg[1]
+  endif
+
+  " Style / Attributes
+  if !empty(a:attr)
+    let l:cmd .= " gui=" . a:attr . " cterm=" . a:attr
+  else
+    let l:cmd .= " gui=NONE cterm=NONE"
+  endif
+
+  execute l:cmd
+endfunction
+
+if &background == 'light'
   " =========================================================================
-  " LIGHT BACKGROUND CONFIGURATION
+  " LIGHT BACKGROUND CONFIGURATION (GUI + 256 Cterm combined)
   " =========================================================================
-
-  hi Normal		guifg=#657b83	guibg=#fdf6e3	gui=NONE
-  hi Search		guifg=#fdf6e3	guibg=#cb4b16	gui=NONE
-  hi Visual		guifg=NONE	guibg=#eee8d5	gui=NONE
-  hi Cursor		guifg=#fdf6e3	guibg=#268bd2	gui=NONE
-  hi Special		guifg=#b58900	guibg=NONE	gui=NONE
-  hi Comment		guifg=#93a1a1	guibg=NONE	gui=italic
-  hi Number		guifg=#cb4b16	guibg=NONE	gui=NONE
-  hi Constant		guifg=#2aa198	guibg=NONE	gui=NONE
-  hi StatusLine		guifg=#657b83	guibg=#eee8d5	gui=NONE
-  hi LineNr		guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-  hi Question		guifg=#268bd2	guibg=NONE	gui=bold
-  hi PreProc		guifg=#cb4b16	guibg=NONE	gui=NONE
-  hi Statement		guifg=#859900	guibg=NONE	gui=NONE
-  hi Type		guifg=#b58900	guibg=NONE	gui=NONE
-  hi Todo		guifg=#dc322f	guibg=#eee8d5	gui=bold
-  hi Error		guifg=#dc322f	guibg=NONE	gui=bold
-  hi Identifier		guifg=#268bd2	guibg=NONE	gui=NONE
-  hi ModeMsg		guifg=#268bd2	guibg=NONE	gui=bold
-  hi VisualNOS		guifg=NONE	guibg=#eee8d5	gui=NONE
-  hi SpecialKey		guifg=#cb4b16	guibg=NONE	gui=NONE
-  hi NonText		guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-  hi Directory		guifg=#268bd2	guibg=NONE	gui=NONE
-  hi ErrorMsg		guifg=#fdf6e3	guibg=#dc322f	gui=NONE
-  hi MoreMsg		guifg=#268bd2	guibg=NONE	gui=NONE
-  hi Title		guifg=#cb4b16	guibg=NONE	gui=bold
-  hi WarningMsg		guifg=#cb4b16	guibg=NONE	gui=bold
-  hi WildMenu		guifg=#657b83	guibg=#eee8d5	gui=bold
-  hi Folded		guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-  hi FoldColumn		guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-  hi DiffAdd		guifg=#859900	guibg=#eee8d5	gui=NONE
-  hi DiffChange		guifg=#b58900	guibg=#eee8d5	gui=NONE
-  hi DiffDelete		guifg=#dc322f	guibg=#eee8d5	gui=NONE
-  hi DiffText		guifg=#268bd2	guibg=#eee8d5	gui=NONE
-  hi SignColumn		guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-
-  hi IncSearch		guifg=#fdf6e3	guibg=#cb4b16	gui=NONE
-  hi StatusLineNC	guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-  hi VertSplit		guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-  hi Underlined		guifg=#6c71c4	guibg=NONE	gui=underline
-  hi Ignore		guifg=#eee8d5	guibg=NONE
+  call s:h("Normal",       ["#657b83", 66],  ["#fdf6e3", 230], "")
+  call s:h("Search",       ["#fdf6e3", 230], ["#cb4b16", 166], "")
+  call s:h("Visual",       ["",       ""],  ["#eee8d5", 254], "")
+  call s:h("Cursor",       ["#fdf6e3", 230], ["#268bd2", 33],  "")
+  call s:h("Special",      ["#b58900", 136], ["",       ""],  "")
+  call s:h("Comment",      ["#93a1a1", 244], ["",       ""],  "italic")
+  call s:h("Number",       ["#cb4b16", 166], ["",       ""],  "")
+  call s:h("Constant",     ["#2aa198", 37],  ["",       ""],  "")
+  call s:h("StatusLine",   ["#657b83", 66],  ["#eee8d5", 254], "")
+  call s:h("LineNr",       ["#93a1a1", 244], ["#eee8d5", 254], "")
+  call s:h("Question",     ["#268bd2", 33],  ["",       ""],  "bold")
+  call s:h("PreProc",      ["#cb4b16", 166], ["",       ""],  "")
+  call s:h("Statement",    ["#859900", 64],  ["",       ""],  "")
+  call s:h("Type",         ["#b58900", 136], ["",       ""],  "")
+  call s:h("Todo",         ["#dc322f", 160], ["#eee8d5", 254], "bold")
+  call s:h("Error",        ["#dc322f", 160], ["",       ""],  "bold")
+  call s:h("Identifier",   ["#268bd2", 33],  ["",       ""],  "")
+  call s:h("ModeMsg",      ["#268bd2", 33],  ["",       ""],  "bold")
+  call s:h("VisualNOS",    ["",       ""],  ["#eee8d5", 254], "")
+  call s:h("SpecialKey",   ["#cb4b16", 166], ["",       ""],  "")
+  call s:h("NonText",      ["#93a1a1", 244], ["#eee8d5", 254], "")
+  call s:h("Directory",    ["#268bd2", 33],  ["",       ""],  "")
+  call s:h("ErrorMsg",     ["#fdf6e3", 230], ["#dc322f", 160], "")
+  call s:h("MoreMsg",      ["#268bd2", 33],  ["",       ""],  "")
+  call s:h("Title",        ["#cb4b16", 166], ["",       ""],  "bold")
+  call s:h("WarningMsg",   ["#cb4b16", 166], ["",       ""],  "bold")
+  call s:h("WildMenu",     ["#657b83", 66],  ["#eee8d5", 254], "bold")
+  call s:h("Folded",       ["#93a1a1", 244], ["#eee8d5", 254], "")
+  call s:h("FoldColumn",   ["#93a1a1", 244], ["#eee8d5", 254], "")
+  call s:h("DiffAdd",      ["#859900", 64],  ["#eee8d5", 254], "")
+  call s:h("DiffChange",   ["#b58900", 136], ["#eee8d5", 254], "")
+  call s:h("DiffDelete",   ["#dc322f", 160], ["#eee8d5", 254], "")
+  call s:h("DiffText",     ["#268bd2", 33],  ["#eee8d5", 254], "")
+  call s:h("SignColumn",   ["#93a1a1", 244], ["#eee8d5", 254], "")
+  call s:h("IncSearch",    ["#fdf6e3", 230], ["#cb4b16", 166], "")
+  call s:h("StatusLineNC", ["#93a1a1", 244], ["#eee8d5", 254], "")
+  call s:h("VertSplit",    ["#93a1a1", 244], ["#eee8d5", 254], "")
+  call s:h("Underlined",   ["#6c71c4", 61],  ["",       ""],  "underline")
+  call s:h("Ignore",       ["#eee8d5", 254], ["",       ""],  "")
 
   if v:version >= 700
     if has('spell')
-      hi SpellBad	guifg=NONE	guibg=NONE	guisp=#dc322f
-      hi SpellCap	guifg=NONE	guibg=NONE	guisp=#268bd2
-      hi SpellRare	guifg=NONE	guibg=NONE	guisp=#d33682
-      hi SpellLocal	guifg=NONE	guibg=NONE	guisp=#2aa198
+      hi SpellBad	guifg=NONE	guibg=NONE	guisp=#dc322f	cterm=undercurl	ctermbg=NONE	ctermfg=160
+      hi SpellCap	guifg=NONE	guibg=NONE	guisp=#268bd2	cterm=undercurl	ctermbg=NONE	ctermfg=33
+      hi SpellRare	guifg=NONE	guibg=NONE	guisp=#d33682	cterm=undercurl	ctermbg=NONE	ctermfg=125
+      hi SpellLocal	guifg=NONE	guibg=NONE	guisp=#2aa198	cterm=undercurl	ctermbg=NONE	ctermfg=37
     endif
-    hi Pmenu		guifg=#657b83	guibg=#eee8d5	gui=NONE
-    hi PmenuSel		guifg=#fdf6e3	guibg=#268bd2	gui=NONE
-    hi PmenuSbar	guifg=#657b83	guibg=#93a1a1	gui=NONE
-    hi PmenuThumb	guifg=#657b83	guibg=#eee8d5	gui=NONE
-    hi TabLine		guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-    hi TabLineFill	guifg=#93a1a1	guibg=#eee8d5	gui=NONE
-    hi TabLineSel	guifg=#657b83	guibg=#fdf6e3	gui=bold
-    hi CursorColumn	guifg=NONE	guibg=#eee8d5	gui=NONE
-    hi CursorLine	guifg=NONE	guibg=#eee8d5	gui=NONE
-    hi MatchParen	guifg=#fdf6e3	guibg=#b58900	gui=NONE
+    call s:h("Pmenu",        ["#657b83", 66],  ["#eee8d5", 254], "")
+    call s:h("PmenuSel",     ["#fdf6e3", 230], ["#268bd2", 33],  "")
+    call s:h("PmenuSbar",    ["#657b83", 66],  ["#93a1a1", 244], "")
+    call s:h("PmenuThumb",   ["#657b83", 66],  ["#eee8d5", 254], "")
+    call s:h("TabLine",      ["#93a1a1", 244], ["#eee8d5", 254], "")
+    call s:h("TabLineFill",  ["#93a1a1", 244], ["#eee8d5", 254], "")
+    call s:h("TabLineSel",   ["#657b83", 66],  ["#fdf6e3", 230], "bold")
+    call s:h("CursorColumn", ["",       ""],  ["#eee8d5", 254], "")
+    call s:h("CursorLine",   ["",       ""],  ["#eee8d5", 254], "")
+    call s:h("MatchParen",   ["#fdf6e3", 230], ["#b58900", 136], "")
   endif
 
-  if &t_Co==8 || &t_Co==16
-    set t_Co=256
-  endif
-  
-  if &t_Co==256
-    hi Normal		ctermfg=66	ctermbg=230	cterm=NONE
-    hi Search		ctermfg=230	ctermbg=166	cterm=NONE
-    hi Visual		ctermfg=NONE	ctermbg=254	cterm=NONE
-    hi Cursor		ctermfg=230	ctermbg=33	cterm=NONE
-    hi Special		ctermfg=136	ctermbg=NONE	cterm=NONE
-    hi Comment		ctermfg=244	ctermbg=NONE	cterm=NONE
-    hi Number		ctermfg=166	ctermbg=NONE	cterm=NONE
-    hi Constant		ctermfg=37	ctermbg=NONE	cterm=NONE
-    hi StatusLine	ctermfg=66	ctermbg=254	cterm=NONE
-    hi LineNr		ctermfg=244	ctermbg=254	cterm=NONE
-    hi Question		ctermfg=33	ctermbg=NONE	cterm=bold
-    hi PreProc		ctermfg=166	ctermbg=NONE	cterm=NONE
-    hi Statement	ctermfg=64	ctermbg=NONE	cterm=NONE
-    hi Type		ctermfg=136	ctermbg=NONE	cterm=NONE
-    hi Todo		ctermfg=160	ctermbg=254	cterm=bold
-    hi Error		ctermfg=160	ctermbg=NONE	cterm=bold
-    hi Identifier	ctermfg=33	ctermbg=NONE	cterm=NONE
-    hi ModeMsg		ctermfg=33	ctermbg=NONE	cterm=bold
-    hi VisualNOS	ctermfg=NONE	ctermbg=254	cterm=NONE
-    hi SpecialKey	ctermfg=166	ctermbg=NONE	cterm=NONE
-    hi NonText		ctermfg=244	ctermbg=254	cterm=NONE
-    hi Directory	ctermfg=33	ctermbg=NONE	cterm=NONE
-    hi ErrorMsg		ctermfg=230	ctermbg=160	cterm=NONE
-    hi MoreMsg		ctermfg=33	ctermbg=NONE	cterm=NONE
-    hi Title		ctermfg=166	ctermbg=NONE	cterm=bold
-    hi WarningMsg	ctermfg=166	ctermbg=NONE	cterm=bold
-    hi WildMenu		ctermfg=66	ctermbg=254	cterm=bold
-    hi Folded		ctermfg=244	ctermbg=254	cterm=NONE
-    hi FoldColumn	ctermfg=244	ctermbg=254	cterm=NONE
-    hi DiffAdd		ctermfg=64	ctermbg=254	cterm=NONE
-    hi DiffChange	ctermfg=136	ctermbg=254	cterm=NONE
-    hi DiffDelete	ctermfg=160	ctermbg=254	cterm=NONE
-    hi DiffText		ctermfg=33	ctermbg=254	cterm=NONE
-    hi SignColumn	ctermfg=244	ctermbg=254	cterm=NONE
-
-    hi IncSearch	ctermfg=230	ctermbg=166	cterm=NONE
-    hi StatusLineNC	ctermfg=244	ctermbg=254	cterm=NONE
-    hi VertSplit	ctermfg=244	ctermbg=254	cterm=NONE
-    hi Underlined	ctermfg=61	ctermbg=NONE	cterm=underline
-    hi Ignore		ctermfg=254	ctermbg=NONE
-
-    if v:version >= 700
-      if has('spell')
-        hi SpellBad	cterm=undercurl	ctermbg=NONE	ctermfg=160
-        hi SpellCap	cterm=undercurl	ctermbg=NONE	ctermfg=33
-        hi SpellRare	cterm=undercurl	ctermbg=NONE	ctermfg=125
-        hi SpellLocal	cterm=undercurl	ctermbg=NONE	ctermfg=37
-      endif
-      hi Pmenu		ctermfg=66	ctermbg=254	cterm=NONE
-      hi PmenuSel	ctermfg=230	ctermbg=33	cterm=NONE
-      hi PmenuSbar	ctermfg=66	ctermbg=244	cterm=NONE
-      hi PmenuThumb	ctermfg=66	ctermbg=254	cterm=NONE
-      hi TabLine	ctermfg=244	ctermbg=254	cterm=NONE
-      hi TabLineFill	ctermfg=244	ctermbg=254	cterm=NONE
-      hi TabLineSel	ctermfg=66	ctermbg=230	cterm=bold
-      hi CursorColumn	ctermfg=NONE	ctermbg=254	cterm=NONE
-      hi CursorLine	ctermfg=NONE	ctermbg=254	cterm=NONE
-      hi MatchParen	ctermfg=230	ctermbg=136	cterm=NONE
-    endif
-  endif
-
-elseif &background=='dark' 
+else
   " =========================================================================
   " DARK BACKGROUND CONFIGURATION (Solarized Dark)
   " =========================================================================
-
-  hi Normal		guifg=#839496	guibg=#002b36	gui=NONE
-  hi Comment		guifg=#586e75	guibg=NONE	gui=italic
-  hi Constant		guifg=#2aa198	guibg=NONE	gui=NONE
-  hi Number		guifg=#cb4b16	guibg=NONE	gui=NONE
-  hi Identifier		guifg=#268bd2	guibg=NONE	gui=NONE
-  hi Statement		guifg=#859900	guibg=NONE	gui=NONE
-  hi PreProc		guifg=#cb4b16	guibg=NONE	gui=NONE
-  hi Type		guifg=#b58900	guibg=NONE	gui=NONE
-  hi Special		guifg=#b58900	guibg=NONE	gui=NONE
-  hi Error		guifg=#dc322f	guibg=NONE	gui=bold
-  hi Todo		guifg=#dc322f	guibg=#073642	gui=bold
-  hi Search		guifg=#002b36	guibg=#b58900	gui=NONE
-  hi Visual		guifg=NONE	guibg=#073642	gui=NONE
-  hi Cursor		guifg=#002b36	guibg=#839496	gui=NONE
-  hi StatusLine		guifg=#839496	guibg=#073642	gui=NONE
-  hi LineNr		guifg=#586e75	guibg=#073642	gui=NONE
-  hi Question		guifg=#268bd2	guibg=NONE	gui=bold
-  hi ModeMsg		guifg=#268bd2	guibg=NONE	gui=bold
-  hi VisualNOS		guifg=NONE	guibg=#073642	gui=NONE
-  hi SpecialKey		guifg=#cb4b16	guibg=NONE	gui=NONE
-  hi NonText		guifg=#586e75	guibg=#073642	gui=NONE
-  hi Directory		guifg=#268bd2	guibg=NONE	gui=NONE
-  hi ErrorMsg		guifg=#002b36	guibg=#dc322f	gui=NONE
-  hi MoreMsg		guifg=#268bd2	guibg=NONE	gui=NONE
-  hi Title		guifg=#cb4b16	guibg=NONE	gui=bold
-  hi WarningMsg		guifg=#cb4b16	guibg=NONE	gui=bold
-  hi WildMenu		guifg=#839496	guibg=#073642	gui=bold
-  hi Folded		guifg=#586e75	guibg=#073642	gui=NONE
-  hi FoldColumn		guifg=#586e75	guibg=#073642	gui=NONE
-  hi DiffAdd		guifg=#859900	guibg=#073642	gui=NONE
-  hi DiffChange		guifg=#b58900	guibg=#073642	gui=NONE
-  hi DiffDelete		guifg=#dc322f	guibg=#073642	gui=NONE
-  hi DiffText		guifg=#268bd2	guibg=#073642	gui=NONE
-  hi SignColumn		guifg=#586e75	guibg=#073642	gui=NONE
-  hi IncSearch		guifg=#002b36	guibg=#cb4b16	gui=NONE
-  hi StatusLineNC	guifg=#586e75	guibg=#073642	gui=NONE
-  hi VertSplit		guifg=#586e75	guibg=#073642	gui=NONE
-  hi Underlined		guifg=#6c71c4	guibg=NONE	gui=underline 
-  hi Ignore		guifg=#002b36	guibg=NONE
+  call s:h("Normal",       ["#839496", 244], ["#002b36", 234], "")
+  call s:h("Comment",      ["#586e75", 240], ["",       ""],  "italic")
+  call s:h("Constant",     ["#2aa198", 37],  ["",       ""],  "")
+  call s:h("Number",       ["#cb4b16", 166], ["",       ""],  "")
+  call s:h("Identifier",   ["#268bd2", 33],  ["",       ""],  "")
+  call s:h("Statement",    ["#859900", 64],  ["",       ""],  "")
+  call s:h("PreProc",      ["#cb4b16", 166], ["",       ""],  "")
+  call s:h("Type",         ["#b58900", 136], ["",       ""],  "")
+  call s:h("Special",      ["#b58900", 136], ["",       ""],  "")
+  call s:h("Error",        ["#dc322f", 160], ["",       ""],  "bold")
+  call s:h("Todo",         ["#dc322f", 160], ["#073642", 235], "bold")
+  call s:h("Search",       ["#002b36", 234], ["#b58900", 136], "")
+  call s:h("Visual",       ["",       ""],  ["#073642", 235], "")
+  call s:h("Cursor",       ["#002b36", 234], ["#839496", 244], "")
+  call s:h("StatusLine",   ["#839496", 244], ["#073642", 235], "")
+  call s:h("LineNr",       ["#586e75", 240], ["#073642", 235], "")
+  call s:h("Question",     ["#268bd2", 33],  ["",       ""],  "bold")
+  call s:h("ModeMsg",      ["#268bd2", 33],  ["",       ""],  "bold")
+  call s:h("VisualNOS",    ["",       ""],  ["#073642", 235], "")
+  call s:h("SpecialKey",   ["#cb4b16", 166], ["",       ""],  "")
+  call s:h("NonText",      ["#586e75", 240], ["#073642", 235], "")
+  call s:h("Directory",    ["#268bd2", 33],  ["",       ""],  "")
+  call s:h("ErrorMsg",     ["#002b36", 234], ["#dc322f", 160], "")
+  call s:h("MoreMsg",      ["#268bd2", 33],  ["",       ""],  "")
+  call s:h("Title",        ["#cb4b16", 166], ["",       ""],  "bold")
+  call s:h("WarningMsg",   ["#cb4b16", 166], ["",       ""],  "bold")
+  call s:h("WildMenu",     ["#839496", 244], ["#073642", 235], "bold")
+  call s:h("Folded",       ["#586e75", 240], ["#073642", 235], "")
+  call s:h("FoldColumn",   ["#586e75", 240], ["#073642", 235], "")
+  call s:h("DiffAdd",      ["#859900", 64],  ["#073642", 235], "")
+  call s:h("DiffChange",   ["#b58900", 136], ["#073642", 235], "")
+  call s:h("DiffDelete",   ["#dc322f", 160], ["#073642", 235], "")
+  call s:h("DiffText",     ["#268bd2", 33],  ["#073642", 235], "")
+  call s:h("SignColumn",   ["#586e75", 240], ["#073642", 235], "")
+  call s:h("IncSearch",    ["#002b36", 234], ["#cb4b16", 166], "")
+  call s:h("StatusLineNC", ["#586e75", 240], ["#073642", 235], "")
+  call s:h("VertSplit",    ["#586e75", 240], ["#073642", 235], "")
+  call s:h("Underlined",   ["#6c71c4", 61],  ["",       ""],  "underline")
+  call s:h("Ignore",       ["#002b36", 234], ["",       ""],  "")
 
   if v:version >= 700
     if has('spell')
-      hi SpellBad	guifg=NONE	guibg=NONE	guisp=#dc322f
-      hi SpellCap	guifg=NONE	guibg=NONE	guisp=#268bd2
-      hi SpellRare	guifg=NONE	guibg=NONE	guisp=#d33682
-      hi SpellLocal	guifg=NONE	guibg=NONE	guisp=#2aa198
+      hi SpellBad	guifg=NONE	guibg=NONE	guisp=#dc322f	cterm=undercurl	ctermbg=NONE	ctermfg=160
+      hi SpellCap	guifg=NONE	guibg=NONE	guisp=#268bd2	cterm=undercurl	ctermbg=NONE	ctermfg=33
+      hi SpellRare	guifg=NONE	guibg=NONE	guisp=#d33682	cterm=undercurl	ctermbg=NONE	ctermfg=125
+      hi SpellLocal	guifg=NONE	guibg=NONE	guisp=#2aa198	cterm=undercurl	ctermbg=NONE	ctermfg=37
     endif
-
-    hi Pmenu          guifg=#839496     guibg=#073642     gui=NONE
-    hi PmenuSel       guifg=#002b36     guibg=#268bd2     gui=NONE
-    hi TabLine		guifg=#586e75	guibg=#073642	gui=NONE
-    hi TabLineFill	guifg=#586e75	guibg=#073642	gui=NONE
-    hi TabLineSel	guifg=#839496	guibg=#002b36	gui=bold
-    hi CursorColumn	guifg=NONE	guibg=#073642	gui=NONE
-    hi CursorLine	guifg=NONE	guibg=#073642	gui=NONE
-    hi MatchParen	guifg=#002b36	guibg=#b58900	gui=NONE
-  endif
-
-  if &t_Co==8 || &t_Co==16
-    set t_Co=256
-  endif
-
-  if &t_Co==256
-    hi Normal		ctermfg=244	ctermbg=234	cterm=NONE
-    hi Comment		ctermfg=240	ctermbg=NONE	cterm=NONE
-    hi Constant		ctermfg=37	ctermbg=NONE	cterm=NONE
-    hi Number		ctermfg=166	ctermbg=NONE	cterm=NONE
-    hi Identifier	ctermfg=33	ctermbg=NONE	cterm=NONE
-    hi Statement	ctermfg=64	ctermbg=NONE	cterm=NONE
-    hi PreProc		ctermfg=166	ctermbg=NONE	cterm=NONE
-    hi Type		ctermfg=136	ctermbg=NONE	cterm=NONE
-    hi Special		ctermfg=136	ctermbg=NONE	cterm=NONE
-    hi Error		ctermfg=160	ctermbg=NONE	cterm=bold
-    hi Todo		ctermfg=160	ctermbg=235	cterm=bold
-    hi Search		ctermfg=234	ctermbg=136	cterm=NONE
-    hi Visual		ctermfg=NONE	ctermbg=235	cterm=NONE
-    hi Cursor		ctermfg=234	ctermbg=244	cterm=NONE
-    hi StatusLine	ctermfg=244	ctermbg=235	cterm=NONE
-    hi LineNr		ctermfg=240	ctermbg=235	cterm=NONE
-    hi Question		ctermfg=33	ctermbg=NONE	cterm=bold
-    hi ModeMsg		ctermfg=33	ctermbg=NONE	cterm=bold
-    hi VisualNOS	ctermfg=NONE	ctermbg=235	cterm=NONE
-    hi SpecialKey	ctermfg=166	ctermbg=NONE	cterm=NONE
-    hi NonText		ctermfg=240	ctermbg=235	cterm=NONE
-    hi Directory	ctermfg=33	ctermbg=NONE	cterm=NONE
-    hi ErrorMsg		ctermfg=234	ctermbg=160	cterm=NONE
-    hi MoreMsg		ctermfg=33	ctermbg=NONE	cterm=NONE
-    hi Title		ctermfg=166	ctermbg=NONE	cterm=bold
-    hi WarningMsg	ctermfg=166	ctermbg=NONE	cterm=bold
-    hi WildMenu		ctermfg=244	ctermbg=235	cterm=bold
-    hi Folded		ctermfg=240	ctermbg=235	cterm=NONE
-    hi FoldColumn	ctermfg=240	ctermbg=235	cterm=NONE
-    hi DiffAdd		ctermfg=64	ctermbg=235	cterm=NONE
-    hi DiffChange	ctermfg=136	ctermbg=235	cterm=NONE
-    hi DiffDelete	ctermfg=160	ctermbg=235	cterm=NONE
-    hi DiffText		ctermfg=33	ctermbg=235	cterm=NONE
-    hi SignColumn	ctermfg=240	ctermbg=235	cterm=NONE
-    hi IncSearch	ctermfg=234	ctermbg=166	cterm=NONE
-    hi StatusLineNC	ctermfg=240	ctermbg=235	cterm=NONE
-    hi VertSplit	ctermfg=240	ctermbg=235	cterm=NONE
-    hi Underlined	ctermfg=61	ctermbg=NONE	cterm=underline 
-    hi Ignore		ctermfg=234	ctermbg=NONE
-
-    if v:version >= 700
-      if has('spell')
-        hi SpellBad	cterm=undercurl	ctermbg=NONE	ctermfg=160
-        hi SpellCap	cterm=undercurl	ctermbg=NONE	ctermfg=33
-        hi SpellRare	cterm=undercurl	ctermbg=NONE	ctermfg=125
-        hi SpellLocal	cterm=undercurl	ctermbg=NONE	ctermfg=37
-      endif
-
-      hi Pmenu		ctermfg=244	ctermbg=235	cterm=NONE
-      hi PmenuSel	ctermfg=234	ctermbg=33	cterm=NONE
-      hi TabLine	ctermfg=240	ctermbg=235	cterm=NONE
-      hi TabLineFill	ctermfg=240	ctermbg=235	cterm=NONE
-      hi TabLineSel	ctermfg=244	ctermbg=234	cterm=bold
-      hi CursorColumn	ctermfg=NONE	ctermbg=235	cterm=NONE
-      hi CursorLine	ctermfg=NONE	ctermbg=235	cterm=NONE
-      hi MatchParen	ctermfg=234	ctermbg=136	cterm=NONE
-    endif
+    call s:h("Pmenu",        ["#839496", 244], ["#073642", 235], "")
+    call s:h("PmenuSel",     ["#002b36", 234], ["#268bd2", 33],  "")
+    call s:h("TabLine",      ["#586e75", 240], ["#073642", 235], "")
+    call s:h("TabLineFill",  ["#586e75", 240], ["#073642", 235], "")
+    call s:h("TabLineSel",   ["#839496", 244], ["#002b36", 234], "bold")
+    call s:h("CursorColumn", ["",       ""],  ["#073642", 235], "")
+    call s:h("CursorLine",   ["",       ""],  ["#073642", 235], "")
+    call s:h("MatchParen",   ["#002b36", 234], ["#b58900", 136], "")
   endif
 endif
 
-" Links:
-hi link		String		Constant
-hi link		Character	Number
-hi link		SpecialChar	LineNr
-hi link		Tag		Identifier
-hi link		cCppOut		LineNr
-hi link		Warning		MoreMsg
-hi link		Notice		Constant
-hi link		CalToday	PreProc
-hi link		MyTagListTagName	IncSearch
-hi link		MyTagListTagScope	Constant
+" Syntax Links:
+hi link String               Constant
+hi link Character            Number
+hi link SpecialChar          LineNr
+hi link Tag                  Identifier
+hi link cCppOut              LineNr
+hi link Warning              MoreMsg
+hi link Notice               Constant
+hi link CalToday             PreProc
+hi link MyTagListTagName     IncSearch
+hi link MyTagListTagScope    Constant
+
+" =========================================================================
+" VISUAL TEST SCRATCH BUFFER
+" =========================================================================
+command! McmillanTest call s:OpenTestBuffer()
+
+function! s:OpenTestBuffer()
+  new
+  setlocal buftype=nofile bufhidden=wipe noswapfile
+  
+  let l:lines = [
+        \ "=== MCMILLAN.VIM VISUAL TEST BUFFER ===",
+        \ "",
+        \ "/* Comment: The quick brown fox jumps over the lazy dog */",
+        \ "#include <stdio.h>",
+        \ "",
+        \ "// Constants and Numbers",
+        \ "const int MAX_USERS = 42;",
+        \ "float pi = 3.14159;",
+        \ "char *greeting = \"Hello, McMillan!\";",
+        \ "",
+        \ "// Keywords, Types, and Statements",
+        \ "typedef struct {",
+        \ "    unsigned long id;",
+        \ "    char name[32];",
+        \ "} UserRecord;",
+        \ "",
+        \ "if (user.id == 0) {",
+        \ "    fprintf(stderr, \"Error: Invalid user ID\\n\");",
+        \ "} else {",
+        \ "    do_something(&user);",
+        \ "}",
+        \ "",
+        \ "// Todo and Error Highlights",
+        \ "// TODO: Fix memory leak in buffer allocation",
+        \ "// ERROR: Unhandled exception caught",
+        \ ]
+  
+  call setline(1, l:lines)
+  setlocal syntax=c
+endfunction
 
 " vim:et:nosta:sw=2:ts=8:
 " vim600:fdm=marker:fdl=1:
