@@ -32,7 +32,7 @@ set nocompatible
 if has('gui_running')
     set background=dark
 else
-    set background=dark
+    set background=light
 endif
 " =============================================================================
 " FORCE mcmillan IN TERMINAL ON STARTUP
@@ -65,6 +65,7 @@ set hlsearch
 set ignorecase
 set incsearch
 set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
+"set listchars=tab:>\ ,trail:-,nbsp:+
 set list
 
 " Hybrid line numbers
@@ -100,12 +101,49 @@ if has('title') && (has('gui_running') || &title)
     set titlestring+=\ -\ %{substitute(getcwd(),\ $HOME,\ '~',\ '')}
 endif
 
+"" Vim cterm highlighting example using Solarized mappings
+"highlight Normal       ctermfg=14  ctermbg=0   " base0  / base03
+"highlight Comment      ctermfg=11              " base01
+"highlight Constant     ctermfg=3               " yellow
+"highlight String       ctermfg=2               " green
+"highlight Identifier   ctermfg=4               " blue
+"highlight Statement    ctermfg=2               " green
+"highlight PreProc      ctermfg=9               " orange
+"highlight Type         ctermfg=3               " yellow
+"highlight Special      ctermfg=1               " red
+"highlight Error        ctermfg=1   ctermbg=0   " red / base03
+"highlight Todo         ctermfg=5   ctermbg=0   " magenta / base03
+"
+"" Nord cterm 256-color mappings
+"highlight Normal       ctermfg=254 ctermbg=236 " nord4 / nord0
+"highlight Comment      ctermfg=242             " nord3
+"highlight Constant     ctermfg=110             " nord9 (blue)
+"highlight String       ctermfg=150             " nord14 (green)
+"highlight Identifier   ctermfg=111             " nord10 (dark blue)
+"highlight Statement    ctermfg=110             " nord9
+"highlight PreProc      ctermfg=139             " nord15 (purple)
+"highlight Type         ctermfg=73              " nord7 (cyan)
+"highlight Error        ctermfg=167 ctermbg=236 " nord11 (red)
+"
+"" Gruvbox cterm 256-color values
+"highlight Normal       ctermfg=223 ctermbg=235 " fg: #ebdbb2, bg: #282828
+"highlight CursorLine               ctermbg=237 " bg: #3c3836
+"highlight Comment      ctermfg=245             " fg: #928374
+"highlight Constant     ctermfg=175             " fg: #d3869b (purple)
+"highlight String       ctermfg=142             " fg: #b8bb26 (green)
+"highlight Identifier   ctermfg=108             " fg: #8ec07c (aqua)
+"highlight Function     ctermfg=108             " fg: #8ec07c (aqua)
+"highlight Statement    ctermfg=167             " fg: #fb4934 (red)
+"highlight PreProc      ctermfg=208             " fg: #fe8019 (orange)
+"highlight Type         ctermfg=214             " fg: #fabd2f (yellow)
+
 " -----------------------------------------------------------------------------
 " mcmillan DARK UI HIGHLIGHTS (SAFE 256-COLOR INDEXING)
 " -----------------------------------------------------------------------------
 augroup mcmillanCompleteUI
     autocmd!
 
+    autocmd ColorScheme mcmillan highlight NonText ctermfg=11 guifg=#586e75
     " --- Line Numbers & Gutters ---
     autocmd ColorScheme mcmillan highlight LineNr       ctermbg=234 ctermfg=240 guibg=#002b36 guifg=#586e75
     autocmd ColorScheme mcmillan highlight CursorLineNr ctermbg=235 ctermfg=245 guibg=#073642 guifg=#93a1a1 cterm=bold gui=bold
