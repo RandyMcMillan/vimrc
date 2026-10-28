@@ -76,6 +76,7 @@ if &background == 'light'
   call s:h("Title",        ["#cb4b16", 166], ["",       ""],  "bold")
   call s:h("WarningMsg",   ["#cb4b16", 166], ["",       ""],  "bold")
   call s:h("WildMenu",     ["#657b83", 66],  ["#eee8d5", 254], "bold")
+  " For Light Background
   call s:h("Folded",       ["#93a1a1", 244], ["#eee8d5", 254], "")
   call s:h("FoldColumn",   ["#93a1a1", 244], ["#eee8d5", 254], "")
   call s:h("DiffAdd",      ["#859900", 64],  ["#eee8d5", 254], "")
@@ -139,6 +140,7 @@ else
   call s:h("Title",        ["#cb4b16", 166], ["",       ""],  "bold")
   call s:h("WarningMsg",   ["#cb4b16", 166], ["",       ""],  "bold")
   call s:h("WildMenu",     ["#839496", 244], ["#073642", 235], "bold")
+  " For Dark Background
   call s:h("Folded",       ["#586e75", 240], ["#073642", 235], "")
   call s:h("FoldColumn",   ["#586e75", 240], ["#073642", 235], "")
   call s:h("DiffAdd",      ["#859900", 64],  ["#073642", 235], "")
@@ -183,8 +185,47 @@ hi link MyTagListTagName     IncSearch
 hi link MyTagListTagScope    Constant
 
 " =========================================================================
+" LIGHTLINE TABLINE INTEGRATION
+" =========================================================================
+augroup McMillanLightline
+  autocmd!
+  autocmd ColorScheme mcmillan,solarized call s:ApplyLightlineTabline()
+augroup END
+
+function! s:ApplyLightlineTabline()
+  if &background == 'light'
+    let l:bg_active   = ["#fdf6e3", 230]
+    let l:bg_inactive = ["#eee8d5", 254]
+    let l:bg_subtle   = ["#93a1a1", 244]
+    let l:fg_active   = ["#657b83", 66]
+    let l:fg_inactive = ["#93a1a1", 244]
+  else
+    let l:bg_active   = ["#002b36", 234]
+    let l:bg_inactive = ["#073642", 235]
+    let l:bg_subtle   = ["#586e75", 240]
+    let l:fg_active   = ["#839496", 244]
+    let l:fg_inactive = ["#586e75", 240]
+  endif
+
+  call s:h("LightlineLeft_tabline_0",           l:fg_inactive, l:bg_subtle,   "")
+  call s:h("LightlineLeft_tabline_0_1",         l:bg_subtle,   l:bg_inactive, "")
+  call s:h("LightlineLeft_tabline_0_tabsel",    l:bg_subtle,   l:bg_active,   "")
+  call s:h("LightlineLeft_tabline_tabsel",      l:fg_active,   l:bg_active,   "bold")
+  call s:h("LightlineLeft_tabline_tabsel_0",    l:bg_active,   l:bg_subtle,   "")
+  call s:h("LightlineLeft_tabline_tabsel_1",    l:bg_active,   l:bg_inactive, "")
+  call s:h("LightlineLeft_tabline_tabsel_tabsel", l:bg_active, l:bg_active,   "")
+
+  call s:h("LightlineRight_tabline_0",          l:fg_inactive, l:bg_subtle,   "")
+  call s:h("LightlineRight_tabline_0_1",        l:bg_subtle,   l:bg_inactive, "")
+  call s:h("LightlineRight_tabline_0_tabsel",   l:bg_subtle,   l:bg_active,   "")
+  call s:h("LightlineRight_tabline_tabsel",     l:fg_active,   l:bg_active,   "bold")
+  call s:h("LightlineRight_tabline_tabsel_0",   l:bg_active,   l:bg_subtle,   "")
+endfunction
+
+" =========================================================================
 " VISUAL TEST SCRATCH BUFFER
 " =========================================================================
+" usage :McmillanTest
 command! McmillanTest call s:OpenTestBuffer()
 
 function! s:OpenTestBuffer()
@@ -221,6 +262,108 @@ function! s:OpenTestBuffer()
   
   call setline(1, l:lines)
   setlocal syntax=c
+endfunction
+
+" =========================================================================
+" VISUAL TEST SCRATCH BUFFER (Expanded)
+" =========================================================================
+command! McmillanTestExpanded call s:OpenTestBuffer()
+
+function! s:OpenTestBuffer()
+  new
+  setlocal buftype=nofile bufhidden=wipe noswapfile
+  
+  let l:lines = [
+        \ "=== MCMILLAN.VIM COMPREHENSIVE VISUAL TEST BUFFER ===",
+        \ "",
+        \ "/* 1. C / C++ & Preprocessor */",
+        \ "#include <stdio.h>",
+        \ "#define MAX_BUFFER 1024",
+        \ "const int STATUS_OK = 200;",
+        \ "char *msg = \"Hello, McMillan Solarized!\";",
+        \ "",
+        \ "typedef struct {",
+        \ "    unsigned long id;",
+        \ "    char label[32];",
+        \ "} Record;",
+        \ "",
+        \ "if (record.id == 0) {",
+        \ "    fprintf(stderr, \"Error: Invalid ID\\n\");",
+        \ "} else {",
+        \ "    process_record(&record);",
+        \ "}",
+        \ "",
+        \ "/* 2. Rust Syntax & Types */",
+        \ "pub fn calculate_hash(input: &[u8]) -> u64 {",
+        \ "    let mut hasher = DefaultHasher::new();",
+        \ "    input.hash(&mut hasher);",
+        \ "    hasher.finish()",
+        \ "}",
+        \ "",
+        \ "/* 3. Todo, Error & Special Highlights */",
+        \ "// TODO: Optimize buffer allocation routine",
+        \ "// FIXME: Potential null pointer dereference",
+        \ "// NOTE: Check terminal color index mapping",
+        \ "",
+        \ "/* 4. Diff Highlights */",
+        \ "+    Added configuration line for ctermfg",
+        \ "-    Removed redundant highlight definitions",
+        \ "!    Modified helper function signature",
+        \ "",
+        \ "/* 5. Numbers & Constants */",
+        \ "let hex_val = 0x2B36;",
+        \ "let float_pi = 3.14159;",
+        \ ]
+  
+  call setline(1, l:lines)
+  setlocal syntax=cpp
+endfunction
+
+" =========================================================================
+" VISUAL TEST SCRATCH BUFFER (Expanded with Shell, Make & Markdown)
+" =========================================================================
+command! McmillanTestMarkdown call s:OpenTestBuffer()
+
+function! s:OpenTestBuffer()
+  new
+  setlocal buftype=nofile bufhidden=wipe noswapfile
+  
+  let l:lines = [
+        \ "=== MCMILLAN.VIM COMPREHENSIVE VISUAL TEST BUFFER ===",
+        \ "",
+        \ "/* 1. C / C++ & Preprocessor */",
+        \ "#include <stdio.h>",
+        \ "#define MAX_BUFFER 1024",
+        \ "const int STATUS_OK = 200;",
+        \ "",
+        \ "# 2. Shell & Git Workflow",
+        \ "#!/usr/bin/env bash",
+        \ "git commit -m \"b17c011 fix parsing error E254\"",
+        \ "export GIT_CONFIG_GLOBAL=/dev/null",
+        \ "",
+        \ "# 3. Makefile & Build Targets",
+        \ "all: clean build test",
+        \ "",
+        \ "build:",
+        \ "\tcargo build --workspace --release",
+        \ "",
+        \ "# 4. Markdown & Documentation Syntax",
+        \ "# Header 1: Decentralized Protocol Engineering",
+        \ "## Header 2: NIP-34 Git Remote Helpers",
+        \ "- Bullet item with **bold text** and `inline code`",
+        \ "> Blockquote: Cryptographic proof-of-work commit mining",
+        \ "",
+        \ "/* 5. Todo, Error & Special Highlights */",
+        \ "// TODO: Optimize buffer allocation routine",
+        \ "// FIXME: Potential null pointer dereference",
+        \ "",
+        \ "/* 6. Diff Highlights */",
+        \ "+    Added lightline tabline override rule",
+        \ "-    Removed redundant color attributes",
+        \ ]
+  
+  call setline(1, l:lines)
+  setlocal syntax=markdown
 endfunction
 
 " vim:et:nosta:sw=2:ts=8:
