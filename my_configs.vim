@@ -14,12 +14,13 @@ set t_Co=256
 set background=light
 colorscheme mcmillan
     autocmd BufWritePost my_configs.vim nested source % | redraw! | echomsg "Sourced " . expand('%:t')
+    " Quick reload and re-apply mcmillan color scheme
 
 
-augroup StartupScratchBuffer
-    autocmd!
-    autocmd VimEnter * if argc() == 0 | execute 'edit ' . tempname() . '.txt' | endif
-augroup END
+"augroup StartupScratchBuffer
+"    autocmd!
+"    autocmd VimEnter * if argc() == 0 | execute 'edit ' . tempname() . '.txt' | endif
+"augroup END
 
 set go+=!
 filetype plugin on
@@ -52,6 +53,12 @@ set backspace=indent,eol,start
 set nomodeline
 set modelineexpr
 set foldenable
+" Set default folding method (choose 'indent' or 'syntax')
+set foldmethod=indent
+nnoremap <Space> za
+" Start with all folds open by default (prevents files from opening completely collapsed)
+set foldlevelstart=99
+nnoremap <Space> za
 set ruler
 syntax on
 set showcmd
@@ -83,9 +90,15 @@ let g:mcmillan_termcolors = 256
 let g:mcmillan_termtrans = 1
 
 " Timeout & Key Mapping Delays
+" timeout: Enables or disables mapping timeouts globally
 set timeout
-set timeoutlen=500
+"set timeoutlen=1000
+" ttimeoutlen: Controls how long Vim waits for terminal
+" key codes (like arrow keys or function keys).
+" Keeping this short (e.g., 50 or 100) prevents sluggish arrow key movement:
 set ttimeoutlen=10
+
+nnoremap <leader>ss :w<CR>:source %<CR>:colorscheme mcmillan<CR>:echo "mcmillan.vim reloaded!"<CR>
 
 " Color guide column positions
 set colorcolumn=3,5,40,50,79,81,129,131,159,161,209,211
@@ -142,8 +155,8 @@ endif
 " -----------------------------------------------------------------------------
 augroup mcmillanCompleteUI
     autocmd!
-
-    autocmd ColorScheme mcmillan highlight NonText ctermfg=11 guifg=#586e75
+    autocmd ColorScheme mcmillan highlight Folded guifg=#b58900 guibg=#073642 ctermfg=136 ctermbg=235 gui=bold
+    autocmd ColorScheme mcmillan highlight NonText ctermbg=234 ctermfg=240 guifg=#586e75
     " --- Line Numbers & Gutters ---
     autocmd ColorScheme mcmillan highlight LineNr       ctermbg=234 ctermfg=240 guibg=#002b36 guifg=#586e75
     autocmd ColorScheme mcmillan highlight CursorLineNr ctermbg=235 ctermfg=245 guibg=#073642 guifg=#93a1a1 cterm=bold gui=bold
