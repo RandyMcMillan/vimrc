@@ -1,6 +1,6 @@
-" Vim color file --- Solarized (Custom Teal Background Variant)
-" Maintainer: Randy McMillan / Adapted for custom background workflow
-" Description: Clean, native-style Solarized color scheme with custom dark teal background.
+" Vim color file --- Solarized (Adapted from Peaksea structure)
+" Maintainer: Randy McMillan / Adapted for Solarized workflow
+" Description: Clean, native-style Solarized color scheme supporting GUI and 256-color terminals.
 
 hi clear
 
@@ -8,7 +8,7 @@ if exists("syntax_on")
   syntax reset
 endif
 
-let g:colors_name = "mcmillan"
+let g:colors_name = "solarized"
 
 if &background=='light' 
   " =========================================================================
@@ -143,10 +143,10 @@ if &background=='light'
 
 elseif &background=='dark' 
   " =========================================================================
-  " DARK BACKGROUND CONFIGURATION (Custom Teal Background: #003344)
+  " DARK BACKGROUND CONFIGURATION (Solarized Dark)
   " =========================================================================
 
-  hi Normal		guifg=#839496	guibg=#003344	gui=NONE
+  hi Normal		guifg=#839496	guibg=#002b36	gui=NONE
   hi Comment		guifg=#586e75	guibg=NONE	gui=italic
   hi Constant		guifg=#2aa198	guibg=NONE	gui=NONE
   hi Number		guifg=#cb4b16	guibg=NONE	gui=NONE
@@ -156,35 +156,35 @@ elseif &background=='dark'
   hi Type		guifg=#b58900	guibg=NONE	gui=NONE
   hi Special		guifg=#b58900	guibg=NONE	gui=NONE
   hi Error		guifg=#dc322f	guibg=NONE	gui=bold
-  hi Todo		guifg=#dc322f	guibg=#002233	gui=bold
-  hi Search		guifg=#003344	guibg=#b58900	gui=NONE
-  hi Visual		guifg=NONE	guibg=#002233	gui=NONE
-  hi Cursor		guifg=#003344	guibg=#839496	gui=NONE
-  hi StatusLine		guifg=#839496	guibg=#002233	gui=NONE
-  hi LineNr		guifg=#586e75	guibg=#002233	gui=NONE
+  hi Todo		guifg=#dc322f	guibg=#073642	gui=bold
+  hi Search		guifg=#002b36	guibg=#b58900	gui=NONE
+  hi Visual		guifg=NONE	guibg=#073642	gui=NONE
+  hi Cursor		guifg=#002b36	guibg=#839496	gui=NONE
+  hi StatusLine		guifg=#839496	guibg=#073642	gui=NONE
+  hi LineNr		guifg=#586e75	guibg=#073642	gui=NONE
   hi Question		guifg=#268bd2	guibg=NONE	gui=bold
   hi ModeMsg		guifg=#268bd2	guibg=NONE	gui=bold
-  hi VisualNOS		guifg=NONE	guibg=#002233	gui=NONE
+  hi VisualNOS		guifg=NONE	guibg=#073642	gui=NONE
   hi SpecialKey		guifg=#cb4b16	guibg=NONE	gui=NONE
-  hi NonText		guifg=#586e75	guibg=#002233	gui=NONE
+  hi NonText		guifg=#586e75	guibg=#073642	gui=NONE
   hi Directory		guifg=#268bd2	guibg=NONE	gui=NONE
-  hi ErrorMsg		guifg=#003344	guibg=#dc322f	gui=NONE
+  hi ErrorMsg		guifg=#002b36	guibg=#dc322f	gui=NONE
   hi MoreMsg		guifg=#268bd2	guibg=NONE	gui=NONE
   hi Title		guifg=#cb4b16	guibg=NONE	gui=bold
   hi WarningMsg		guifg=#cb4b16	guibg=NONE	gui=bold
-  hi WildMenu		guifg=#839496	guibg=#002233	gui=bold
-  hi Folded		guifg=#586e75	guibg=#002233	gui=NONE
-  hi FoldColumn		guifg=#586e75	guibg=#002233	gui=NONE
-  hi DiffAdd		guifg=#859900	guibg=#002233	gui=NONE
-  hi DiffChange		guifg=#b58900	guibg=#002233	gui=NONE
-  hi DiffDelete		guifg=#dc322f	guibg=#002233	gui=NONE
-  hi DiffText		guifg=#268bd2	guibg=#002233	gui=NONE
-  hi SignColumn		guifg=#586e75	guibg=#002233	gui=NONE
-  hi IncSearch		guifg=#003344	guibg=#cb4b16	gui=NONE
-  hi StatusLineNC	guifg=#586e75	guibg=#002233	gui=NONE
-  hi VertSplit		guifg=#586e75	guibg=#002233	gui=NONE
+  hi WildMenu		guifg=#839496	guibg=#073642	gui=bold
+  hi Folded		guifg=#586e75	guibg=#073642	gui=NONE
+  hi FoldColumn		guifg=#586e75	guibg=#073642	gui=NONE
+  hi DiffAdd		guifg=#859900	guibg=#073642	gui=NONE
+  hi DiffChange		guifg=#b58900	guibg=#073642	gui=NONE
+  hi DiffDelete		guifg=#dc322f	guibg=#073642	gui=NONE
+  hi DiffText		guifg=#268bd2	guibg=#073642	gui=NONE
+  hi SignColumn		guifg=#586e75	guibg=#073642	gui=NONE
+  hi IncSearch		guifg=#002b36	guibg=#cb4b16	gui=NONE
+  hi StatusLineNC	guifg=#586e75	guibg=#073642	gui=NONE
+  hi VertSplit		guifg=#586e75	guibg=#073642	gui=NONE
   hi Underlined		guifg=#6c71c4	guibg=NONE	gui=underline 
-  hi Ignore		guifg=#003344	guibg=NONE
+  hi Ignore		guifg=#002b36	guibg=NONE
 
   if v:version >= 700
     if has('spell')
@@ -194,14 +194,14 @@ elseif &background=='dark'
       hi SpellLocal	guifg=NONE	guibg=NONE	guisp=#2aa198
     endif
 
-    hi Pmenu          guifg=#839496     guibg=#002233     gui=NONE
-    hi PmenuSel       guifg=#003344     guibg=#268bd2     gui=NONE
-    hi TabLine		guifg=#586e75	guibg=#002233	gui=NONE
-    hi TabLineFill	guifg=#586e75	guibg=#002233	gui=NONE
-    hi TabLineSel	guifg=#839496	guibg=#003344	gui=bold
-    hi CursorColumn	guifg=NONE	guibg=#002233	gui=NONE
-    hi CursorLine	guifg=NONE	guibg=#002233	gui=NONE
-    hi MatchParen	guifg=#003344	guibg=#b58900	gui=NONE
+    hi Pmenu          guifg=#839496     guibg=#073642     gui=NONE
+    hi PmenuSel       guifg=#002b36     guibg=#268bd2     gui=NONE
+    hi TabLine		guifg=#586e75	guibg=#073642	gui=NONE
+    hi TabLineFill	guifg=#586e75	guibg=#073642	gui=NONE
+    hi TabLineSel	guifg=#839496	guibg=#002b36	gui=bold
+    hi CursorColumn	guifg=NONE	guibg=#073642	gui=NONE
+    hi CursorLine	guifg=NONE	guibg=#073642	gui=NONE
+    hi MatchParen	guifg=#002b36	guibg=#b58900	gui=NONE
   endif
 
   if &t_Co==8 || &t_Co==16
@@ -209,7 +209,7 @@ elseif &background=='dark'
   endif
 
   if &t_Co==256
-    hi Normal		ctermfg=244	ctermbg=23	cterm=NONE
+    hi Normal		ctermfg=244	ctermbg=234	cterm=NONE
     hi Comment		ctermfg=240	ctermbg=NONE	cterm=NONE
     hi Constant		ctermfg=37	ctermbg=NONE	cterm=NONE
     hi Number		ctermfg=166	ctermbg=NONE	cterm=NONE
@@ -219,35 +219,35 @@ elseif &background=='dark'
     hi Type		ctermfg=136	ctermbg=NONE	cterm=NONE
     hi Special		ctermfg=136	ctermbg=NONE	cterm=NONE
     hi Error		ctermfg=160	ctermbg=NONE	cterm=bold
-    hi Todo		ctermfg=160	ctermbg=17	cterm=bold
-    hi Search		ctermfg=23	ctermbg=136	cterm=NONE
-    hi Visual		ctermfg=NONE	ctermbg=17	cterm=NONE
-    hi Cursor		ctermfg=23	ctermbg=244	cterm=NONE
-    hi StatusLine	ctermfg=244	ctermbg=17	cterm=NONE
-    hi LineNr		ctermfg=240	ctermbg=17	cterm=NONE
+    hi Todo		ctermfg=160	ctermbg=235	cterm=bold
+    hi Search		ctermfg=234	ctermbg=136	cterm=NONE
+    hi Visual		ctermfg=NONE	ctermbg=235	cterm=NONE
+    hi Cursor		ctermfg=234	ctermbg=244	cterm=NONE
+    hi StatusLine	ctermfg=244	ctermbg=235	cterm=NONE
+    hi LineNr		ctermfg=240	ctermbg=235	cterm=NONE
     hi Question		ctermfg=33	ctermbg=NONE	cterm=bold
     hi ModeMsg		ctermfg=33	ctermbg=NONE	cterm=bold
-    hi VisualNOS	ctermfg=NONE	ctermbg=17	cterm=NONE
+    hi VisualNOS	ctermfg=NONE	ctermbg=235	cterm=NONE
     hi SpecialKey	ctermfg=166	ctermbg=NONE	cterm=NONE
-    hi NonText		ctermfg=240	ctermbg=17	cterm=NONE
+    hi NonText		ctermfg=240	ctermbg=235	cterm=NONE
     hi Directory	ctermfg=33	ctermbg=NONE	cterm=NONE
-    hi ErrorMsg		ctermfg=23	ctermbg=160	cterm=NONE
+    hi ErrorMsg		ctermfg=234	ctermbg=160	cterm=NONE
     hi MoreMsg		ctermfg=33	ctermbg=NONE	cterm=NONE
     hi Title		ctermfg=166	ctermbg=NONE	cterm=bold
     hi WarningMsg	ctermfg=166	ctermbg=NONE	cterm=bold
-    hi WildMenu		ctermfg=244	ctermbg=17	cterm=bold
-    hi Folded		ctermfg=240	ctermbg=17	cterm=NONE
-    hi FoldColumn	ctermfg=240	ctermbg=17	cterm=NONE
-    hi DiffAdd		ctermfg=64	ctermbg=17	cterm=NONE
-    hi DiffChange	ctermfg=136	ctermbg=17	cterm=NONE
-    hi DiffDelete	ctermfg=160	ctermbg=17	cterm=NONE
-    hi DiffText		ctermfg=33	ctermbg=17	cterm=NONE
-    hi SignColumn	ctermfg=240	ctermbg=17	cterm=NONE
-    hi IncSearch	ctermfg=23	ctermbg=166	cterm=NONE
-    hi StatusLineNC	ctermfg=240	ctermbg=17	cterm=NONE
-    hi VertSplit	ctermfg=240	ctermbg=17	cterm=NONE
+    hi WildMenu		ctermfg=244	ctermbg=235	cterm=bold
+    hi Folded		ctermfg=240	ctermbg=235	cterm=NONE
+    hi FoldColumn	ctermfg=240	ctermbg=235	cterm=NONE
+    hi DiffAdd		ctermfg=64	ctermbg=235	cterm=NONE
+    hi DiffChange	ctermfg=136	ctermbg=235	cterm=NONE
+    hi DiffDelete	ctermfg=160	ctermbg=235	cterm=NONE
+    hi DiffText		ctermfg=33	ctermbg=235	cterm=NONE
+    hi SignColumn	ctermfg=240	ctermbg=235	cterm=NONE
+    hi IncSearch	ctermfg=234	ctermbg=166	cterm=NONE
+    hi StatusLineNC	ctermfg=240	ctermbg=235	cterm=NONE
+    hi VertSplit	ctermfg=240	ctermbg=235	cterm=NONE
     hi Underlined	ctermfg=61	ctermbg=NONE	cterm=underline 
-    hi Ignore		ctermfg=23	ctermbg=NONE
+    hi Ignore		ctermfg=234	ctermbg=NONE
 
     if v:version >= 700
       if has('spell')
@@ -257,14 +257,14 @@ elseif &background=='dark'
         hi SpellLocal	cterm=undercurl	ctermbg=NONE	ctermfg=37
       endif
 
-      hi Pmenu		ctermfg=244	ctermbg=17	cterm=NONE
-      hi PmenuSel	ctermfg=23	ctermbg=33	cterm=NONE
-      hi TabLine	ctermfg=240	ctermbg=17	cterm=NONE
-      hi TabLineFill	ctermfg=240	ctermbg=17	cterm=NONE
-      hi TabLineSel	ctermfg=244	ctermbg=23	cterm=bold
-      hi CursorColumn	ctermfg=NONE	ctermbg=17	cterm=NONE
-      hi CursorLine	ctermfg=NONE	ctermbg=17	cterm=NONE
-      hi MatchParen	ctermfg=23	ctermbg=136	cterm=NONE
+      hi Pmenu		ctermfg=244	ctermbg=235	cterm=NONE
+      hi PmenuSel	ctermfg=234	ctermbg=33	cterm=NONE
+      hi TabLine	ctermfg=240	ctermbg=235	cterm=NONE
+      hi TabLineFill	ctermfg=240	ctermbg=235	cterm=NONE
+      hi TabLineSel	ctermfg=244	ctermbg=234	cterm=bold
+      hi CursorColumn	ctermfg=NONE	ctermbg=235	cterm=NONE
+      hi CursorLine	ctermfg=NONE	ctermbg=235	cterm=NONE
+      hi MatchParen	ctermfg=234	ctermbg=136	cterm=NONE
     endif
   endif
 endif

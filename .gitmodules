@@ -1,0 +1,3 @@
+[submodule "my_plugins/mcmillan"]
+	path = my_plugins/mcmillan
+	url = https://github.com/RandyMcMillan/mcmillan.vim.git
