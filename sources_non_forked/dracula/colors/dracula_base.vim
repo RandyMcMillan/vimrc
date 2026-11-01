@@ -274,6 +274,10 @@ hi! link Visual       DraculaSelection
 hi! link VisualNOS    Visual
 hi! link WarningMsg   DraculaOrangeInverse
 
+if has('gui_running')
+  hi! link Terminal Normal
+endif
+
 " }}}
 " Syntax: {{{
 
@@ -756,9 +760,7 @@ hi! link xmlTag     Delimiter
 hi! link xmlTagName Statement
 
 " Fixes missing highlight over end tags
-syn region xmlTagName
-	\ matchgroup=xmlTag start=+</[^ /!?<>"']\@=+
-	\ matchgroup=xmlTag end=+>+
+syn region xmlTagName matchgroup=xmlTag start=+</[^ /!?<>"']\@=+ end=+>+
 " }}}
 
 " YAML: {{{
