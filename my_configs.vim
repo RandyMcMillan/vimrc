@@ -14,23 +14,23 @@ endif
 let g:peaksea_loaded = 1
 
 set go+=!
-"filetype plugin on
-"filetype on
+filetype plugin on
+filetype on
 "set nocompatible
 "set backspace=indent,eol,start
 "set nomodeline
 "set modelineexpr
 "" 1. Enable global syntax highlighting
-"if !exists("g:syntax_on")
-"    syntax enable
-"endif
-"set foldenable
-"" Set default folding method (choose 'indent' or 'syntax')
-"set foldmethod=syntax
-"nnoremap <Space> za
-"" Start with all folds open by default (prevents files from opening completely collapsed)
-"set foldlevelstart=99
-"nnoremap <Space> za
+if !exists("g:syntax_on")
+    syntax enable
+endif
+set foldenable
+" Set default folding method (choose 'indent' or 'syntax')
+set foldmethod=syntax
+nnoremap <Space> za
+" Start with all folds open by default (prevents files from opening completely collapsed)
+set foldlevelstart=99
+nnoremap <Space> za
 "set ruler
 "set showcmd
 "set exrc
