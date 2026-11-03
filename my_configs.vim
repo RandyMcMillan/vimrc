@@ -42,7 +42,7 @@ set go+=!
 "set hlsearch
 "set ignorecase
 "set incsearch
-"set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
+set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
 ""set listchars=tab:>\ ,trail:-,nbsp:+
 "set list
 "set background=dark
@@ -254,7 +254,7 @@ let mapleader = "\\"
 "
 "" Custom Key Mappings
 "nmap <silent> <leader>t :call TogglemcmillanColors()<CR>
-"nmap <silent> <leader>l :set list!<CR>
+nmap <silent> <leader>l :set list!<CR>
 nmap <silent> <leader>n :NERDTreeToggle<CR>
 "nmap <silent> <leader>z :call ToggleAllFolds()<CR>
 "nmap <silent> qz        :call ToggleAllFolds()<CR>
