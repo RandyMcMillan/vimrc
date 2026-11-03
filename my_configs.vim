@@ -57,16 +57,12 @@ augroup GlobalAutoReload
     " Triggers on ALL files (*) but safely checks the file type before sourcing
     autocmd BufReadPost,BufNewFile * nested
         \   source % | redraw! | echomsg "Sourced " . expand('%:t') |
-        "autocmd VimEnter * nested set background=dark | colorscheme mcmillan
-        "autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE
-        "autocmd ColorScheme * highlight NonText ctermbg=NONE guibg=NONE
-        "autocmd ColorScheme * highlight EndOfBuffer ctermbg=NONE guibg=NONE
-        "autocmd ColorScheme * highlight LineNr ctermbg=NONE guibg=NONE
-        "autocmd BufWritePost my_configs.vim source % | colorscheme mcmillan
-        "autocmd BufWritePost .vimrc source % | colorscheme *
-        "autocmd BufWritePost vimrc source % | colorscheme *
-        "autocmd BufWritePost my_configs.vim source % | colorscheme *
-        "autocmd BufWritePost my_configs.vim nested source % | redraw! | echomsg "Sourced " . expand('%:t')
+        autocmd VimEnter * nested set background=dark | colorscheme mcmillan
+        autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE
+        autocmd ColorScheme * highlight NonText ctermbg=NONE guibg=NONE
+        autocmd ColorScheme * highlight EndOfBuffer ctermbg=NONE guibg=NONE
+        autocmd ColorScheme * highlight LineNr ctermbg=NONE guibg=NONE
+        autocmd BufWritePost my_configs.vim nested source % | redraw! | echomsg "Sourced " . expand('%:t')
 augroup END
 "
 "" 3. Set your active global colorscheme
