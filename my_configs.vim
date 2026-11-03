@@ -129,7 +129,7 @@ let mapleader = "\\"
 "    "" --- Cursors & Guides ---
 "    ""autocmd ColorScheme * highlight CursorLine   ctermbg=235 guibg=#073642 cterm=none gui=none
 "    ""autocmd ColorScheme * highlight CursorColumn ctermbg=235 guibg=#073642
-"    ""autocmd ColorScheme * highlight ColorColumn  ctermbg=235 guibg=#073642
+     ""autocmd ColorScheme * highlight ColorColumn  ctermbg=235 guibg=#073642
 "
 "    "" --- Selection & Search ---
 "    "autocmd ColorScheme * highlight Visual    ctermbg=235 ctermfg=250 guibg=#073642 guifg=#eee8d5
