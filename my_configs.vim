@@ -38,19 +38,19 @@ set number
 "set laststatus=2
 set showmode
 set title
-"set scrolloff=3
+set scrolloff=3
 "set hlsearch
 "set ignorecase
 "set incsearch
 set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
 ""set listchars=tab:>\ ,trail:-,nbsp:+
 "set list
-"set background=dark
+set background=dark
 "" Hybrid line numbers
-"if exists("&relativenumber")
-"    "set number relativenumber
-"    "au BufReadPost * set relativenumber
-"endif
+if exists("&relativenumber")
+    set number relativenumber
+    au BufReadPost * set relativenumber
+endif
 "
 augroup GlobalAutoReload
     autocmd!
@@ -302,10 +302,10 @@ nmap <silent> <leader>n :NERDTreeToggle<CR>
 "
 "    augroup END
 "
-"    augroup FileTypeDetect
-"        autocmd!
-"        autocmd BufNewFile,BufRead *.json setfiletype json syntax=javascript
-"        autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
+    augroup FileTypeDetect
+        autocmd!
+        autocmd BufNewFile,BufRead *.json setfiletype json syntax=javascript
+        autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
 "
 "        " File shebang detection
 "        autocmd BufNewFile,BufRead * if match(getline(1),"python") >= 0 | set filetype=python     | endif
@@ -327,7 +327,7 @@ nmap <silent> <leader>n :NERDTreeToggle<CR>
 "
 "        " Restore cursor position
 "        autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-"    augroup END
+    augroup END
 "
 "    augroup VimScriptFolding
 "        autocmd!
