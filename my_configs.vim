@@ -39,8 +39,8 @@ set number
 set showmode
 set title
 set scrolloff=3
-"set hlsearch
-"set ignorecase
+set hlsearch
+set ignorecase
 "set incsearch
 set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
 ""set listchars=tab:>\ ,trail:-,nbsp:+
