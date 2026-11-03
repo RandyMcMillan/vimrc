@@ -68,7 +68,7 @@ let g:mcmillan_termtrans = 1
 "nnoremap <leader>ss :w<CR>:source %<CR>:colorscheme mcmillan<CR>:echo "mcmillan.vim reloaded!"<CR>
 "
 "" Color guide column positions
-""set colorcolumn=3,5,40,50,79,81,129,131,159,161,209,211
+set colorcolumn=3,5,40,50,79,81,129,131,159,161,209,211
 "
 "" Leader Key Definition
 let mapleader = "\\"
