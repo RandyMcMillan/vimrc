@@ -31,7 +31,7 @@ nnoremap <Space> za
 " Start with all folds open by default (prevents files from opening completely collapsed)
 set foldlevelstart=99
 nnoremap <Space> za
-"set ruler
+set ruler
 "set showcmd
 "set exrc
 "set number
