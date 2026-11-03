@@ -34,7 +34,7 @@ nnoremap <Space> za
 set ruler
 set showcmd
 "set exrc
-"set number
+set number
 "set laststatus=2
 "set showmode
 "set title
