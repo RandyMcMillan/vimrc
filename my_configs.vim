@@ -32,7 +32,7 @@ nnoremap <Space> za
 set foldlevelstart=99
 nnoremap <Space> za
 set ruler
-"set showcmd
+set showcmd
 "set exrc
 "set number
 "set laststatus=2
