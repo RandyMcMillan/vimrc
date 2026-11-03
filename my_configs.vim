@@ -11,7 +11,7 @@ let g:peaksea_loaded = 1
 
 " Force mcmillan for both GUI and Terminal consistently on startup
 set t_Co=256
-set background=light
+set background=dark
 colorscheme mcmillan
     autocmd BufWritePost my_configs.vim nested source % | redraw! | echomsg "Sourced " . expand('%:t')
     " Quick reload and re-apply mcmillan color scheme
@@ -33,7 +33,7 @@ set nocompatible
 if has('gui_running')
     set background=dark
 else
-    set background=light
+    set background=dark
 endif
 " =============================================================================
 " FORCE mcmillan IN TERMINAL ON STARTUP
@@ -54,7 +54,7 @@ set nomodeline
 set modelineexpr
 set foldenable
 " Set default folding method (choose 'indent' or 'syntax')
-set foldmethod=indent
+set foldmethod=syntax
 nnoremap <Space> za
 " Start with all folds open by default (prevents files from opening completely collapsed)
 set foldlevelstart=99
@@ -86,8 +86,8 @@ if &t_Co < 256
     set t_Co=256
 endif
 
-let g:mcmillan_termcolors = 256
-let g:mcmillan_termtrans = 1
+let g:mcmillan_termcolors = 16
+let g:mcmillan_termtrans = 0
 
 " Timeout & Key Mapping Delays
 " timeout: Enables or disables mapping timeouts globally
@@ -155,6 +155,12 @@ endif
 " -----------------------------------------------------------------------------
 augroup mcmillanCompleteUI
     autocmd!
+
+    " --- Base Normal Text --- control background color
+    "                          set transparent
+    autocmd ColorScheme mcmillan highlight Normal ctermbg=NONE guibg=NONE | highlight NonText ctermbg=NONE guibg=NONE
+    " autocmd ColorScheme mcmillan highlight Normal ctermbg=234 ctermfg=244 guibg=#002b36 guifg=#839496
+
     autocmd ColorScheme mcmillan highlight Folded guifg=#b58900 guibg=#073642 ctermfg=136 ctermbg=235 gui=bold
     autocmd ColorScheme mcmillan highlight NonText ctermbg=234 ctermfg=240 guifg=#586e75
     " --- Line Numbers & Gutters ---
@@ -174,7 +180,8 @@ augroup mcmillanCompleteUI
     autocmd ColorScheme mcmillan highlight IncSearch ctermbg=166 ctermfg=234 guibg=#cb4b16 guifg=#002b36 cterm=none gui=none
 
     " --- Base Normal Text ---
-    autocmd ColorScheme mcmillan highlight Normal ctermbg=234 ctermfg=244 guibg=#002b36 guifg=#839496
+    autocmd ColorScheme mcmillan highlight Normal ctermbg=NONE guibg=NONE | highlight NonText ctermbg=NONE guibg=NONE
+    " autocmd ColorScheme mcmillan highlight Normal ctermbg=234 ctermfg=244 guibg=#002b36 guifg=#839496
 
     " --- Statusline ---
     autocmd ColorScheme mcmillan highlight StatusLine   ctermbg=235 ctermfg=245 guibg=#073642 guifg=#93a1a1 cterm=none gui=none
