@@ -77,8 +77,8 @@ colorscheme mcmillan
 "    "autocmd VimEnter * nested set background=dark | colorscheme mcmillan
 ""augroup END
 ""
-""let g:mcmillan_termcolors = 256
-""let g:mcmillan_termtrans = 1
+let g:mcmillan_termcolors = 256
+let g:mcmillan_termtrans = 1
 "
 "" Timeout & Key Mapping Delays
 "" timeout: Enables or disables mapping timeouts globally
@@ -193,29 +193,29 @@ let mapleader = "\\"
 "" -----------------------------------------------------------------------------
 "
 "" 1. Toggle mcmillan Termcolors / Light-Dark Toggling
-"function! TogglemcmillanColors()
-"    if g:mcmillan_termcolors == 256
-"        let g:mcmillan_termcolors = 16
-"        echo "mcmillan Termcolors: 16"
-"        set background=dark
-"        try
-"            colorscheme mcmillan
-"        catch
-"        echo "mcmillan Termcolors: 16"
-"        endtry
-"
-"    else
-"        let g:mcmillan_termcolors = 256
-"        echo "mcmillan Termcolors: 256"
-"        set background=dark
-"        try
-"            colorscheme mcmillan
-"        catch
-"        echo "mcmillan Termcolors: 256"
-"        endtry
-"    endif
-"    "colorscheme mcmillan
-"endfunction
+function! TogglemcmillanColors()
+    if g:mcmillan_termcolors == 256
+        let g:mcmillan_termcolors = 16
+        echo "mcmillan Termcolors: 16"
+        set background=dark
+        try
+            colorscheme mcmillan
+        catch
+        echo "mcmillan Termcolors: 16"
+        endtry
+
+    else
+        let g:mcmillan_termcolors = 256
+        echo "mcmillan Termcolors: 256"
+        set background=dark
+        try
+            colorscheme mcmillan
+        catch
+        echo "mcmillan Termcolors: 256"
+        endtry
+    endif
+    "colorscheme mcmillan
+endfunction
 "
 "" 2. Smart Fold Toggling across entire file
 "function! ToggleAllFolds()
@@ -249,7 +249,7 @@ let mapleader = "\\"
 "endfunction
 "
 "" Custom Key Mappings
-"nmap <silent> <leader>t :call TogglemcmillanColors()<CR>
+nmap <silent> <leader>t :call TogglemcmillanColors()<CR>
 nmap <silent> <leader>l :set list!<CR>
 nmap <silent> <leader>n :NERDTreeToggle<CR>
 "nmap <silent> <leader>z :call ToggleAllFolds()<CR>
