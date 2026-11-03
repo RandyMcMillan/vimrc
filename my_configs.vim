@@ -51,32 +51,8 @@ if exists("&relativenumber")
     set number relativenumber
     au BufReadPost * set relativenumber
 endif
-"
-augroup GlobalAutoReload
-    autocmd!
-    " Triggers on ALL files (*) but safely checks the file type before sourcing
-    autocmd BufReadPost,BufNewFile * nested
-        \   source % | redraw! | echomsg "Sourced " . expand('%:t') |
-        autocmd VimEnter * nested set background=dark | colorscheme mcmillan
-        autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE
-        autocmd ColorScheme * highlight NonText ctermbg=NONE guibg=NONE
-        autocmd ColorScheme * highlight EndOfBuffer ctermbg=NONE guibg=NONE
-        autocmd ColorScheme * highlight LineNr ctermbg=NONE guibg=NONE
-        autocmd BufWritePost my_configs.vim nested source % | redraw! | echomsg "Sourced " . expand('%:t')
-augroup END
-"
-"" 3. Set your active global colorscheme
+ 
 colorscheme mcmillan
-"
-"
-""" 3. Initialize the Colorscheme
-"""colorscheme mcmillan
-""    " Force background and color scheme after terminal UI initializes
-""augroup ForceTerminalmcmillan
-""    autocmd!
-"    "autocmd VimEnter * nested set background=dark | colorscheme mcmillan
-""augroup END
-""
 let g:mcmillan_termcolors = 256
 let g:mcmillan_termtrans = 1
 "
@@ -218,25 +194,25 @@ function! TogglemcmillanColors()
 endfunction
 "
 "" 2. Smart Fold Toggling across entire file
-"function! ToggleAllFolds()
-"    let l:has_closed_fold = 0
-"    let l:i = 1
-"    while l:i <= line('$')
-"        if foldclosed(l:i) != -1
-"            let l:has_closed_fold = 1
-"            break
-"        endif
-"        let l:i += 1
-"    endwhile
-"
-"    if l:has_closed_fold
-"        normal! zR
-"        echo "All folds opened"
-"    else
-"        normal! zM
-"        echo "All folds collapsed"
-"    endif
-"endfunction
+function! ToggleAllFolds()
+    let l:has_closed_fold = 0
+    let l:i = 1
+    while l:i <= line('$')
+        if foldclosed(l:i) != -1
+            let l:has_closed_fold = 1
+            break
+        endif
+        let l:i += 1
+    endwhile
+
+    if l:has_closed_fold
+        normal! zR
+        echo "All folds opened"
+    else
+        normal! zM
+        echo "All folds collapsed"
+    endif
+endfunction
 "
 "" 3. Check Terminal Size
 "function! CheckTerminalSize()
@@ -252,15 +228,15 @@ endfunction
 nmap <silent> <leader>t :call TogglemcmillanColors()<CR>
 nmap <silent> <leader>l :set list!<CR>
 nmap <silent> <leader>n :NERDTreeToggle<CR>
-"nmap <silent> <leader>z :call ToggleAllFolds()<CR>
-"nmap <silent> qz        :call ToggleAllFolds()<CR>
+nmap <silent> <leader>z :call ToggleAllFolds()<CR>
+nmap <silent> qz        :call ToggleAllFolds()<CR>
 "nnoremap <silent> <leader>Z za
 "nnoremap <silent> <leader>T :call CheckTerminalSize()<CR>
 "
-"nnoremap <silent> <leader>f :set foldmethod=indent<CR>:echo "Fold method: indent"<CR>
-"nnoremap <silent> <leader>ff :set foldmethod=indent<CR>:echo "Fold method: indent"<CR>
-"nnoremap <silent> <leader>fs :set foldmethod=syntax<CR>:echo "Fold method: syntax"<CR>
-"nnoremap <silent> <leader>fm :set foldmethod=marker<CR>:echo "Fold method: marker"<CR>
+nnoremap <silent> <leader>f :set foldmethod=indent<CR>:echo "Fold method: indent"<CR>
+nnoremap <silent> <leader>ff :set foldmethod=indent<CR>:echo "Fold method: indent"<CR>
+nnoremap <silent> <leader>fs :set foldmethod=syntax<CR>:echo "Fold method: syntax"<CR>
+nnoremap <silent> <leader>fm :set foldmethod=marker<CR>:echo "Fold method: marker"<CR>
 "
 "" Save and source immediately with <leader>w
 "nnoremap <silent> <leader>w :w<CR>:source %<CR>:redraw!<CR>:echo "Saved & Sourced!"<CR>
@@ -300,8 +276,8 @@ nmap <silent> <leader>n :NERDTreeToggle<CR>
 "
     augroup FileTypeDetect
         autocmd!
-        autocmd BufNewFile,BufRead *.json setfiletype json syntax=javascript
-        autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
+        "autocmd BufNewFile,BufRead *.json setfiletype json syntax=javascript
+        "autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
 "
 "        " File shebang detection
 "        autocmd BufNewFile,BufRead * if match(getline(1),"python") >= 0 | set filetype=python     | endif
