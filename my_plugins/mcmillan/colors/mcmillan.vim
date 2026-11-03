@@ -101,6 +101,10 @@ if &background == 'light'
   call s:h("Underlined",           ["#6c71c4", 61],      ["",       ""],      "underline")
   call s:h("Ignore",               ["#eee8d5", 254],     ["",       ""],      "")
 
+  "autocmd ColorScheme * highlight ColorColumn  ctermbg=235 guibg=#073642
+  call s:h("ColorColumn", [], ["#073642", 235], "")
+
+
   if v:version >= 700
     if has('spell')
       hi SpellBad	guifg=NONE	guibg=NONE	guisp=#dc322f	cterm=undercurl	ctermbg=NONE	ctermfg=160
@@ -172,6 +176,8 @@ else
   call s:h("VertSplit",            ["#586e75", 240],     ["#073642", 235],    "")
   call s:h("Underlined",           ["#6c71c4", 61],      ["",       ""],      "underline")
   call s:h("Ignore",               ["#002b36", 234],     ["",       ""],      "")
+  "autocmd ColorScheme * highlight ColorColumn  ctermbg=235 guibg=#073642
+  call s:h("ColorColumn", [], ["#073642", 235], "")
 
   if v:version >= 700
     if has('spell')
