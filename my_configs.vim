@@ -37,7 +37,7 @@ set showcmd
 set number
 "set laststatus=2
 set showmode
-"set title
+set title
 "set scrolloff=3
 "set hlsearch
 "set ignorecase
