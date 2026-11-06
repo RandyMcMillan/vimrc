@@ -1,3 +1,6 @@
 [submodule "my_plugins/mcmillan"]
 	path = my_plugins/mcmillan
 	url = https://github.com/RandyMcMillan/mcmillan.vim.git
+[submodule "my_plugins/nerdtree-git-plugin"]
+	path = my_plugins/nerdtree-git-plugin
+	url = https://github.com/RandyMcMillan/nerdtree-git-plugin.git
