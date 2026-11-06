@@ -116,12 +116,12 @@ let mapleader = "\\"
 "" -----------------------------------------------------------------------------
 "" mcmillan DARK UI HIGHLIGHTS (SAFE 256-COLOR INDEXING)
 "" -----------------------------------------------------------------------------
-"augroup mcmillanCompleteUI
+augroup mcmillanCompleteUI
     autocmd!
 "
 "    " --- Base Normal Text --- control background color
 "    "                          set transparent
-     "autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE | highlight NonText ctermbg=NONE guibg=NONE | highlight EndOfBuffer ctermbg=NONE guibg=NONE
+     autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE | highlight NonText ctermbg=NONE guibg=NONE | highlight EndOfBuffer ctermbg=NONE guibg=NONE
 "
 "    "autocmd ColorScheme * highlight Folded guifg=#b58900 guibg=#073642 ctermfg=136 ctermbg=235 gui=bold
 "    "" --- Line Numbers & Gutters ---
@@ -166,7 +166,7 @@ let mapleader = "\\"
 "    "autocmd ColorScheme * highlight LightlineRight_tabline_0_tabsel        ctermfg=240 ctermbg=235 guifg=#666666 guibg=#242424
 "    "autocmd ColorScheme * highlight LightlineRight_tabline_tabsel         ctermfg=250 ctermbg=235 guifg=#d0d0d0 guibg=#242424
 "    "autocmd ColorScheme * highlight LightlineRight_tabline_tabsel_0       ctermfg=235 ctermbg=240 guifg=#242424 guibg=#666666
-"augroup END
+augroup END
 "
 "" -----------------------------------------------------------------------------
 "" DYNAMIC FUNCTIONS & KEY BINDINGS
@@ -346,8 +346,12 @@ let NERDTreeShowHidden=0
 let NERDTreeChDirMode=2
 ""
 ""
-""
-let g:NERDTreeIndicatorMapCustom = {
+
+highlight NERDTreeGitStatusModified ctermfg=208 guifg=#fe8019
+highlight NERDTreeGitStatusUntracked ctermfg=214 guifg=#fabd2f
+highlight NERDTreeGitStatusStaged ctermfg=142 guifg=#b8bb26
+
+    let g:NERDTreeIndicatorMapCustom = {
     \ "Modified"  : "*",
     \ "Staged"    : "+",
     \ "Untracked" : "~",
@@ -365,3 +369,31 @@ let g:NERDTreeIndicatorMapCustom = {
 "    autocmd VimEnter * if argc() > 0 | wincmd p | endif
 "    "autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 "augroup END
+"
+"
+"
+function! TogglePathogenPlugin(name)
+    if !exists('g:pathogen_disabled')
+        let g:pathogen_disabled = []
+    endif
+    
+    let l:index = index(g:pathogen_disabled, a:name)
+    if l:index >= 0
+        " Remove from disabled list (enable it)
+        call remove(g:pathogen_disabled, l:index)
+        echo "Enabled plugin: " . a:name . " (restart vim to load)"
+    else
+        " Add to disabled list
+        call add(g:pathogen_disabled, a:name)
+        echo "Disabled plugin: " . a:name . " (restart vim to unload)"
+    endif
+endfunction
+
+" Create a user command :TogglePlugin plugin_name
+command! -nargs=1 TogglePlugin call TogglePathogenPlugin(<f-args>)
+"nmap <silent> <leader>m :call TogglePlugin('mcmillan')<CR>
+nmap <silent> <leader>m :TogglePlugin mcmillan<CR>
+
+
+" hard exit vim
+nmap <silent> <leader>T :suspend<CR>
