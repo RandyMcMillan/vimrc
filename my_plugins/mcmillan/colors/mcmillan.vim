@@ -131,7 +131,7 @@ else
 
   "     Target Group        Foreground (Text)     Background Color      Style Options
   "          │                      │                     │                   │
-  " call s:h("Normal",             ["#839496", 244],     ["#002b36", 234],    "")
+  "call s:h("Normal",             ["#839496", 244],     ["#002b36", 234],    "")
   call s:h("Normal",               ["#839496", 244],     ["NONE", "NONE"],    "")
   call s:h("NonText",              ["#586e75", 240],     ["NONE", "NONE"],    "")
   call s:h("EndOfBuffer",          ["#586e75", 240],     ["NONE", "NONE"],    "")

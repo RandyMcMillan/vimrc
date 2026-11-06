@@ -52,9 +52,13 @@ if exists("&relativenumber")
     au BufReadPost * set relativenumber
 endif
  
-colorscheme mcmillan
-let g:mcmillan_termcolors = 256
-let g:mcmillan_termtrans = 1
+try
+    colorscheme mcmillan
+    let g:mcmillan_termcolors = 256
+    let g:mcmillan_termtrans = 1
+catch
+echo "mcmillan Termcolors: 16"
+endtry
 "
 "" Timeout & Key Mapping Delays
 "" timeout: Enables or disables mapping timeouts globally
@@ -113,11 +117,11 @@ let mapleader = "\\"
 "" mcmillan DARK UI HIGHLIGHTS (SAFE 256-COLOR INDEXING)
 "" -----------------------------------------------------------------------------
 "augroup mcmillanCompleteUI
-"    autocmd!
+    autocmd!
 "
 "    " --- Base Normal Text --- control background color
 "    "                          set transparent
-"    autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE | highlight NonText ctermbg=NONE guibg=NONE | highlight EndOfBuffer ctermbg=NONE guibg=NONE
+     "autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE | highlight NonText ctermbg=NONE guibg=NONE | highlight EndOfBuffer ctermbg=NONE guibg=NONE
 "
 "    "autocmd ColorScheme * highlight Folded guifg=#b58900 guibg=#073642 ctermfg=136 ctermbg=235 gui=bold
 "    "" --- Line Numbers & Gutters ---
@@ -192,7 +196,13 @@ function! TogglemcmillanColors()
     endif
     "colorscheme mcmillan
 endfunction
-"
+
+" call on start
+augroup McMillanStartup
+    autocmd!
+    autocmd VimEnter * call TogglemcmillanColors()
+augroup END
+ 
 "" 2. Smart Fold Toggling across entire file
 function! ToggleAllFolds()
     let l:has_closed_fold = 0
@@ -329,14 +339,29 @@ nnoremap <silent> <leader>fm :set foldmethod=marker<CR>:echo "Fold method: marke
 "            \ "Standard" : "C++11"}
 "nmap <Leader>C :ClangFormatAutoToggle<CR>
 "
-" NERDTree Setup
-let g:NERDTreeFileExtensionHighlightFullName = 1
-let NERDTreeWinPos = 0
-let NERDTreeShowHidden = 1
+"" NERDTree Setup
+"let g:NERDTreeFileExtensionHighlightFullNamex=1
+let NERDTreeWinPos=0
+let NERDTreeShowHidden=0
+let NERDTreeChDirMode=2
+""
+""
+""
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "*",
+    \ "Staged"    : "+",
+    \ "Untracked" : "~",
+    \ "Renamed"   : "➔",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔",
+    \ "Ignored"   : "☒",
+    \ }
 "
-augroup NERDTreeSmartAutostart
-    autocmd!
-    autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-    autocmd VimEnter * if argc() > 0 | wincmd p | endif
-    "autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-augroup END
+"augroup NERDTreeSmartAutostart
+"    autocmd!
+"    autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+"    autocmd VimEnter * if argc() > 0 | wincmd p | endif
+"    "autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+"augroup END
