@@ -351,8 +351,8 @@ highlight NERDTreeGitStatusModified ctermfg=208 guifg=#fe8019
 highlight NERDTreeGitStatusUntracked ctermfg=214 guifg=#fabd2f
 highlight NERDTreeGitStatusStaged ctermfg=142 guifg=#b8bb26
 
-    let g:NERDTreeIndicatorMapCustom = {
-    \ "Modified"  : "*",
+    let g:NERDTreeGitStatusIndicatorMapCustom = {
+    \ "Modified"  : "<<<",
     \ "Staged"    : "+",
     \ "Untracked" : "~",
     \ "Renamed"   : "➔",

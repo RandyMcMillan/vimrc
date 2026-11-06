@@ -95,7 +95,7 @@ let g:NERDTreeWinSize=35
 map <leader>nn :NERDTreeToggle<cr>
 map <leader>nb :NERDTreeFromBookmark<Space>
 map <leader>nf :NERDTreeFind<cr>
-let g:NERDTreeIndicatorMapCustom = {
+let g:NERDTreeStatusIndicatorMapCustom = {
     \ "Modified"  : "*",
     \ "Staged"    : "+",
     \ "Untracked" : "~",
