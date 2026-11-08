@@ -2,6 +2,10 @@ name: Capture Vim and Neovim Screenshots
 
 on:
   workflow_dispatch: # Allows manual trigger from the Actions tab
+  workflow_run:
+    workflows: [ "Build Screenshot Image" ]
+    types: [completed]
+    branches: [ "master", "main" ]
   push:
     branches: [ "master", "main" ]
     paths:
@@ -9,17 +13,21 @@ on:
 
 jobs:
   screenshot:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/randymcmillan/vimrc-screenshots:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     # Ensure the workflow token has write permissions to commit back to the repo
     permissions:
       contents: write
+      packages: read
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Install Vim, Neovim and recording dependencies
-      uses: ./.github/actions/install-recording-dependencies
 
     - name: Capture screenshots
       uses: ./.github/actions/capture-screenshots
