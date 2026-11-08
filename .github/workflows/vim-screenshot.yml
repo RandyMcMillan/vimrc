@@ -18,6 +18,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install Vim, Neovim and recording dependencies
+      uses: ./.github/actions/install-recording-dependencies
+
     - name: Capture screenshots
       uses: ./.github/actions/capture-screenshots
 
