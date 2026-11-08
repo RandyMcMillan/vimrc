@@ -6,7 +6,7 @@ Set Theme "Builtin Solarized Dark"
 
 # Hide the initial setup typing
 Hide
-Type "vim -u NONE --cmd 'set runtimepath+=./sources_non_forked/nerdtree' --cmd 'filetype on' -c 'set termguicolors background=dark' -c 'syntax on' -c 'colorscheme desert' -c 'runtime plugin/NERD_tree.vim' -c 'NERDTree' -c 'wincmd p' README.md"
+Type "vim -u NONE --cmd 'set runtimepath+=./sources_non_forked/nerdtree,./my_plugins/mcmillan' --cmd 'filetype on' -c 'set termguicolors background=dark' -c 'syntax on' -c 'colorscheme mcmillan' -c 'runtime plugin/NERD_tree.vim' -c 'NERDTree' -c 'wincmd p' README.md"
 Enter
 Sleep 1s
 Show
