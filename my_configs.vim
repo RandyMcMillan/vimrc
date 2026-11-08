@@ -342,7 +342,7 @@ nnoremap <silent> <leader>fm :set foldmethod=marker<CR>:echo "Fold method: marke
 "" NERDTree Setup
 "let g:NERDTreeFileExtensionHighlightFullNamex=1
 let NERDTreeWinPos=0
-let NERDTreeShowHidden=0
+let NERDTreeShowHidden=1
 let NERDTreeChDirMode=2
 ""
 ""
