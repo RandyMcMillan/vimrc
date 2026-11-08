@@ -2,7 +2,7 @@
 Set Width 1200
 Set Height 800
 Set FontSize 18
-Set Theme "Solarized Dark"
+Set Theme "Builtin Solarized Dark"
 
 # Hide the initial setup typing
 Hide
