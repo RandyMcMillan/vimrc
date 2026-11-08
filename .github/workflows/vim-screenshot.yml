@@ -28,8 +28,7 @@ jobs:
         echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
         curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
         sudo apt-get update
-        sudo apt-get install -y vhs
-
+        sudo apt-get install -y vhs ttyd ffmpeg chromium-browser
     - name: Run VHS Tape Script
       run: vhs < screenshot.tape
 
