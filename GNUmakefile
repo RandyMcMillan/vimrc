@@ -96,6 +96,10 @@ submodule-remotes:
 submodule-discover:
 	@git config --file .gitmodules --get-regexp path | awk '{ print $$2 }'
 
+.PHONY: act-screenshots
+act-screenshots:
+	act -v -r --bind --container-architecture linux/amd64 -W .github/workflows/vim-screenshot.yml -j screenshot workflow_dispatch
+
 
 # FORCE has no commands and no prerequisites, so it never exists on disk
 FORCE:
