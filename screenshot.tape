@@ -19,8 +19,10 @@ Sleep 200ms
 Type "# Automated documentation update via GitHub Actions"
 Escape
 Sleep 500ms
+
+# Save the Vim frame before exiting
+Screenshot docs/vim-screenshot.png
+Sleep 500ms
+
 Type ":wq"        # Save and quit
 Enter
-
-# Save the output as a PNG screenshot (or .gif)
-Screenshot docs/vim-screenshot.png

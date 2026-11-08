@@ -30,7 +30,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y vhs ttyd ffmpeg chromium-browser
     - name: Run VHS Tape Script
-      run: vhs < screenshot.tape
+      run: |
+        mkdir -p docs
+        vhs < screenshot.tape
+        test -s docs/vim-screenshot.png
 
     - name: Commit and Push Screenshot
       run: |
