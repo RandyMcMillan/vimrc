@@ -46,9 +46,7 @@ jobs:
         vhs < screenshot.tape
         test -s docs/vim-screenshot.png
         vhs < nvim-screenshot.tape
-        ffmpeg -hide_banner -y -i docs/nvim-screenshot.png -frames:v 1 -q:v 2 docs/nvim-screenshot.jpg
         test -s docs/nvim-screenshot.png
-        test -s docs/nvim-screenshot.jpg
 
     - name: Commit and Push Screenshots
       run: |
@@ -57,7 +55,7 @@ jobs:
         
         # Check if there are any changes to commit
         git status
-        git add docs/vim-screenshot.png docs/nvim-screenshot.png docs/nvim-screenshot.jpg
+        git add docs/vim-screenshot.png docs/nvim-screenshot.png
         
         if git diff --staged --quiet; then
           echo "No changes to commit."
