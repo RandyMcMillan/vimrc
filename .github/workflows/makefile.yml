@@ -29,7 +29,7 @@ jobs:
       run: |
         brew install python@${{ matrix.python-version }}
         brew unlink python@3.12 && brew link python@3.12 || brew link --overwrite python@${{ matrix.python-version }}
-        python3.${{ matrix.python-version }} --version
+        python${{ matrix.python-version }} --version
 
     - name: Run Makefile Setup & Build
       run: make
