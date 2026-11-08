@@ -1,0 +1,3 @@
+[project]
+name = "libp2p"   # <-- Make sure this matches what you want to call it
+version = "0.1.0"

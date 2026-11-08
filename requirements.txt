@@ -1,0 +1,3 @@
+# requirements.txt
+libp2p @ git+https://github.com/RandyMcMillan/py-libp2p.git@main
+requests>=2.31.0
