@@ -6,7 +6,7 @@ Set Theme "Builtin Solarized Dark"
 
 # Hide the initial setup typing
 Hide
-Type "nvim -u NONE --cmd 'set runtimepath+=./sources_non_forked/nerdtree' -c 'runtime plugin/NERD_tree.vim' -c 'NERDTree' -c 'wincmd p' README.md"
+Type "nvim -u NONE --cmd 'set runtimepath+=./sources_non_forked/nerdtree' -c 'syntax on' -c 'runtime plugin/NERD_tree.vim' -c 'NERDTree' -c 'wincmd p' README.md"
 Enter
 Sleep 1s
 Show
