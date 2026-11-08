@@ -1,0 +1,50 @@
+name: Capture Vim Screenshot
+
+on:
+  workflow_dispatch: # Allows manual trigger from the Actions tab
+  push:
+    branches: [ "master", "main" ]
+    paths:
+      - 'README.md'  # Trigger when relevant files change
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+
+    # Ensure the workflow token has write permissions to commit back to the repo
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Neovim and dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y neovim
+
+    - name: Install VHS (Terminal Recorder)
+      run: |
+        echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
+        curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+        sudo apt-get update
+        sudo apt-get install -y vhs
+
+    - name: Run VHS Tape Script
+      run: vhs < screenshot.tape
+
+    - name: Commit and Push Screenshot
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Check if there are any changes to commit
+        git status
+        git add docs/vim-screenshot.png
+        
+        if git diff --staged --quiet; then
+          echo "No changes to commit."
+        else
+          git commit -m "chore: auto-generate vim terminal screenshot [skip ci]"
+          git push
+        fi
