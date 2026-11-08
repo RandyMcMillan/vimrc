@@ -33,6 +33,7 @@ jobs:
       uses: ./.github/actions/capture-screenshots
 
     - name: Commit and Push Screenshots
+      if: ${{ env.ACT != 'true' }}
       run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git config --global user.name "github-actions[bot]"
