@@ -6,23 +6,18 @@ Set Theme "Builtin Solarized Dark"
 
 # Hide the initial setup typing
 Hide
-Type "vim -u NONE --cmd 'set runtimepath+=./sources_non_forked/nerdtree,./my_plugins/mcmillan' --cmd 'filetype on' -c 'set termguicolors background=dark' -c 'syntax on' -c 'colorscheme mcmillan' -c 'runtime plugin/NERD_tree.vim' -c 'NERDTree' -c 'wincmd p' README.md"
+Type "vim -u NONE --cmd 'set runtimepath+=./sources_non_forked/nerdtree,./my_plugins/mcmillan' --cmd 'filetype on' -c 'set termguicolors background=dark' -c 'syntax on' -c 'colorscheme mcmillan' -c 'runtime plugin/NERD_tree.vim' -c 'NERDTree' -c 'wincmd p' my_configs.vim"
 Enter
 Sleep 1s
 Show
 
-# Perform actions inside Vim
-Type "G"          # Go to the bottom of the file
-Sleep 300ms
-Type "o"          # Open a new line in insert mode
-Sleep 200ms
-Type "# Automated documentation update via GitHub Actions"
-Escape
+# Show the configuration without modifying it
+Type "gg"
 Sleep 500ms
 
 # Save the Vim frame before exiting
 Screenshot docs/vim-screenshot.png
 Sleep 500ms
 
-Type ":wqa"       # Save and quit both windows
+Type ":qa"        # Quit both windows
 Enter
