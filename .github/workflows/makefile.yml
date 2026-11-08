@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    if: ${{ github.actor != 'nektos/act' }}
     runs-on: ${{ matrix.os }}
 
     strategy:
