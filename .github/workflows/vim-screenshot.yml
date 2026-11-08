@@ -18,17 +18,28 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Vim and Neovim
+    - name: Set APT cache key
+      id: apt-cache-key
       run: |
-        sudo apt-get update
-        sudo apt-get install -y vim neovim
+        echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
 
-    - name: Install VHS (Terminal Recorder)
+    - name: Cache downloaded APT packages
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.temp }}/screenshot-apt-cache/*.deb
+        key: ${{ runner.os }}-${{ runner.arch }}-screenshot-apt-${{ hashFiles('.github/workflows/vim-screenshot.yml') }}-${{ steps.apt-cache-key.outputs.week }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-screenshot-apt-${{ hashFiles('.github/workflows/vim-screenshot.yml') }}-
+
+    - name: Install Vim, Neovim and recording dependencies
       run: |
+        mkdir -p "$RUNNER_TEMP/screenshot-apt-cache"
         echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
         curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
         sudo apt-get update
-        sudo apt-get install -y vhs ttyd ffmpeg chromium-browser
+        sudo apt-get -o Dir::Cache::archives="$RUNNER_TEMP/screenshot-apt-cache" \
+          -o APT::Keep-Downloaded-Packages=true \
+          install -y vim neovim vhs ttyd ffmpeg chromium-browser
     - name: Run VHS Tape Scripts
       run: |
         mkdir -p docs
