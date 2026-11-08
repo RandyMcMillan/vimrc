@@ -21,15 +21,18 @@ jobs:
     - name: Set APT cache key
       id: apt-cache-key
       run: |
+        . /etc/os-release
+        echo "release=$VERSION_ID" >> "$GITHUB_OUTPUT"
         echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
 
-    - name: Cache downloaded APT packages
-      uses: actions/cache@v4
+    - name: Restore recording dependencies
+      id: apt-cache
+      uses: actions/cache/restore@v4
       with:
         path: ${{ runner.temp }}/screenshot-apt-cache/*.deb
-        key: ${{ runner.os }}-${{ runner.arch }}-screenshot-apt-${{ hashFiles('.github/workflows/vim-screenshot.yml') }}-${{ steps.apt-cache-key.outputs.week }}
+        key: ${{ runner.os }}-${{ runner.arch }}-ubuntu-${{ steps.apt-cache-key.outputs.release }}-screenshot-apt-v1-vim-neovim-vhs-ttyd-ffmpeg-chromium-${{ steps.apt-cache-key.outputs.week }}
         restore-keys: |
-          ${{ runner.os }}-${{ runner.arch }}-screenshot-apt-${{ hashFiles('.github/workflows/vim-screenshot.yml') }}-
+          ${{ runner.os }}-${{ runner.arch }}-ubuntu-${{ steps.apt-cache-key.outputs.release }}-screenshot-apt-v1-vim-neovim-vhs-ttyd-ffmpeg-chromium-
 
     - name: Install Vim, Neovim and recording dependencies
       run: |
@@ -40,6 +43,14 @@ jobs:
         sudo apt-get -o Dir::Cache::archives="$RUNNER_TEMP/screenshot-apt-cache" \
           -o APT::Keep-Downloaded-Packages=true \
           install -y vim neovim vhs ttyd ffmpeg chromium-browser
+
+    - name: Save recording dependencies
+      if: steps.apt-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ runner.temp }}/screenshot-apt-cache/*.deb
+        key: ${{ steps.apt-cache.outputs.cache-primary-key }}
+
     - name: Run VHS Tape Scripts
       run: |
         mkdir -p docs
