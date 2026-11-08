@@ -12,7 +12,7 @@ Show
 Type "G"
 Sleep 500ms
 
-Screenshot docs/nvim-screenshot.jpg
+Screenshot docs/nvim-screenshot.png
 Sleep 500ms
 
 Type ":qa"
