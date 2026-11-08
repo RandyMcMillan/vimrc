@@ -6,9 +6,9 @@ Set Theme "Builtin Solarized Dark"
 
 # Hide the initial setup typing
 Hide
-Type "nvim README.md"
+Type "nvim -u NONE --cmd 'set runtimepath+=./sources_non_forked/nerdtree' -c 'runtime plugin/NERD_tree.vim' -c 'NERDTree' -c 'wincmd p' README.md"
 Enter
-Sleep 500ms
+Sleep 1s
 Show
 
 # Perform actions inside Vim
@@ -24,5 +24,5 @@ Sleep 500ms
 Screenshot docs/vim-screenshot.png
 Sleep 500ms
 
-Type ":wq"        # Save and quit
+Type ":wqa"       # Save and quit both windows
 Enter
