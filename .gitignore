@@ -10,3 +10,4 @@ tags
 .DS_Store
 
 mempool
+venv/
